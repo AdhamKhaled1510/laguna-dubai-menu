@@ -366,30 +366,30 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-amber-50/40 text-stone-800" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 text-stone-700" dir="rtl">
       <Toaster position="top-center" richColors />
 
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-40 border-b border-stone-200/80">
+      <header className="bg-white/80 backdrop-blur-xl shadow-sm sticky top-0 z-40 border-b border-rose-100/60">
         <div className="container mx-auto px-4 py-5 flex flex-col items-center">
-          <div className="relative mb-4">
-            <div className="absolute inset-0 bg-amber-200/30 rounded-full blur-3xl" />
-            <img src={logoUrl} alt="Laguna Dubai Logo" className="h-28 w-auto object-contain relative rounded-2xl border-2 border-amber-200/40 shadow-xl shadow-amber-200/20" />
+          <div className="relative mb-3">
+            <div className="absolute inset-0 bg-gradient-to-r from-rose-200/30 via-pink-200/30 to-rose-200/30 rounded-full blur-3xl" />
+            <img src={logoUrl} alt="Laguna Dubai Logo" className="h-32 w-auto object-contain relative drop-shadow-lg" />
           </div>
           
           <div className="text-center mb-5">
-            <h1 className="text-4xl font-black text-stone-800 tracking-wide" style={{ fontFamily: "'Montserrat Arabic', sans-serif" }}>Laguna Dubai</h1>
-            <p className="text-sm text-stone-400 uppercase tracking-[0.2em] mt-1.5 font-medium">Café & Restaurant</p>
+            <h1 className="text-4xl font-black tracking-wide bg-gradient-to-r from-rose-600 to-pink-500 bg-clip-text text-transparent">Laguna Dubai</h1>
+            <p className="text-sm text-rose-300 uppercase tracking-[0.25em] mt-1.5 font-semibold">Café & Restaurant</p>
           </div>
 
           <div className="w-full max-w-md mx-auto relative">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-400" />
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-rose-300" />
             <Input
               type="text"
               placeholder="ابحث في المنيو..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-12 text-right h-12 text-base bg-white border-stone-200 text-stone-800 placeholder:text-stone-400 focus:border-amber-400 focus:ring-amber-400 rounded-xl shadow-sm"
+              className="pr-12 text-right h-12 text-base bg-white/80 border-rose-200 text-stone-700 placeholder:text-rose-300 focus:border-rose-400 focus:ring-rose-400 rounded-xl shadow-sm backdrop-blur-sm"
             />
           </div>
         </div>
@@ -399,9 +399,9 @@ export default function App() {
       <main className="container mx-auto px-4 py-6 pb-32">
         <Tabs defaultValue="all" className="w-full" dir="rtl">
           <div className="overflow-x-auto pb-2 mb-6 scrollbar-hide">
-            <TabsList className="inline-flex gap-2 h-12 px-2 bg-amber-100/50 rounded-xl border border-stone-200/50 w-max min-w-full shadow-sm">
+            <TabsList className="inline-flex gap-2 h-12 px-2 bg-rose-100/50 rounded-xl border border-rose-200/50 w-max min-w-full shadow-sm backdrop-blur-sm">
               {categories.map((cat) => (
-                <TabsTrigger key={cat.value} value={cat.value} className="text-sm px-4 py-2 font-bold rounded-lg text-stone-500 data-[state=active]:bg-amber-500 data-[state=active]:text-white transition-all">
+                <TabsTrigger key={cat.value} value={cat.value} className="text-sm px-4 py-2 font-bold rounded-lg text-rose-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:to-pink-500 data-[state=active]:text-white transition-all">
                   {cat.label}
                 </TabsTrigger>
               ))}
@@ -427,7 +427,7 @@ export default function App() {
 
         {filteredItems().length === 0 && (
           <div className="text-center py-20">
-            <p className="text-xl text-stone-400">لا توجد نتائج للبحث</p>
+            <p className="text-xl text-rose-300">لا توجد نتائج للبحث</p>
           </div>
         )}
       </main>
