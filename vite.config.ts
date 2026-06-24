@@ -17,7 +17,7 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
-  base: '/laguna-dubai-menu/',
+  base: '/laguna-dubai1510/',
   plugins: [
     figmaAssetResolver(),
     react(),
