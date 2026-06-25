@@ -76,9 +76,9 @@ export function CartSheet({ cartItems, onRemoveItem, onClearCart, onCheckout }: 
                       variant="ghost"
                       size="icon"
                       onClick={() => onRemoveItem(item.id)}
-                      className="h-7 w-7 text-stone-300 hover:text-red-400 hover:bg-red-50"
+                      className="h-8 w-8 md:h-9 md:w-9 text-stone-300 hover:text-red-400 hover:bg-red-50"
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
+                      <Trash2 className="h-4 w-4 md:h-4.5 md:w-4.5" />
                     </Button>
                   </div>
                 ))}

@@ -417,18 +417,18 @@ export default function App() {
           headerVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
-        <div className="container mx-auto px-4 py-4 flex flex-col items-center relative">
-          <img src={logoUrl} alt="Laguna Dubai" className="h-20 w-auto mb-2 brightness-0 invert" />
-          <h1 className="text-2xl font-bold tracking-[0.15em] text-white" style={{ fontFamily: "'Playfair Display', serif" }}>LAGUNA DUBAI</h1>
-          <p className="text-xs text-white/50 tracking-[0.3em] mt-1">CAFÉ &bull; RESTAURANT</p>
-          <div className="w-full max-w-md mx-auto mt-4 relative">
+        <div className="container mx-auto px-4 md:px-6 py-3 md:py-4 flex flex-col items-center relative">
+          <img src={logoUrl} alt="Laguna Dubai" className="h-16 md:h-20 w-auto mb-1 md:mb-2 brightness-0 invert" />
+          <h1 className="text-xl md:text-2xl font-bold tracking-[0.15em] text-white" style={{ fontFamily: "'Playfair Display', serif" }}>LAGUNA DUBAI</h1>
+          <p className="text-[10px] md:text-xs text-white/50 tracking-[0.3em] mt-1">CAFÉ &bull; RESTAURANT</p>
+          <div className="w-full max-w-md mx-auto mt-3 md:mt-4 relative">
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
             <Input
               type="text"
               placeholder="ابحث في المنيو..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-10 text-right h-10 text-sm bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-amber-400/40 focus:ring-amber-400/20 rounded-full shadow-sm"
+              className="pr-10 text-right h-9 md:h-10 text-sm bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-amber-400/40 focus:ring-amber-400/20 rounded-full shadow-sm"
             />
           </div>
         </div>
@@ -438,16 +438,14 @@ export default function App() {
       </header>
 
       {/* Category Navigation */}
-      <div className="sticky z-30 bg-[#f5f0eb]/95 backdrop-blur-md border-b border-stone-200/40 shadow-sm"
-        style={{ top: headerVisible ? '132px' : '0' }}
-      >
-        <div className="container mx-auto px-4 py-3 overflow-x-auto scrollbar-hide">
-          <div className="flex gap-2 w-max mx-auto">
+      <div className={`sticky z-30 bg-[#f5f0eb]/95 backdrop-blur-md border-b border-stone-200/40 shadow-sm ${headerVisible ? 'top-[116px] md:top-[132px]' : 'top-0'}`}>
+        <div className="container mx-auto px-4 md:px-6 py-3 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 md:gap-3 w-max mx-auto">
             {categories.map((cat) => (
               <button
                 key={cat.value}
                 onClick={() => handleCategoryChange(cat.value)}
-                className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`whitespace-nowrap px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm md:text-base font-medium transition-all duration-200 ${
                   activeCategory === cat.value
                     ? 'bg-stone-800 text-white shadow-md'
                     : 'bg-white/70 text-stone-500 hover:bg-stone-100 border border-stone-200/50'
@@ -461,8 +459,8 @@ export default function App() {
       </div>
 
       {/* Items Grid */}
-      <main className="container mx-auto px-4 py-8 pb-32">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <main className="container mx-auto px-4 md:px-6 py-6 md:py-8 pb-32">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
           {filteredItems(activeCategory).map((item, idx) => (
             <MenuItem
               key={item.id}

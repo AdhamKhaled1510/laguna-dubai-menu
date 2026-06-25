@@ -57,29 +57,29 @@ export function MenuItem({ item, quantity, onAdd, onRemove, style }: MenuItemPro
         </div>
 
         {quantity === 0 ? (
-          <Button onClick={onAdd} className="w-full bg-gradient-to-r from-stone-800 to-stone-700 hover:from-stone-700 hover:to-stone-600 text-white font-medium h-10 rounded-lg text-sm transition-all duration-200 active:scale-[0.98]" size="lg">
-            <Plus className="ml-1.5 h-4 w-4" />
+          <Button onClick={onAdd} className="w-full bg-gradient-to-r from-stone-800 to-stone-700 hover:from-stone-700 hover:to-stone-600 text-white font-medium h-10 md:h-11 rounded-lg text-sm transition-all duration-200 active:scale-[0.98]" size="lg">
+            <Plus className="ml-1.5 h-4 w-4 md:h-5 md:w-5" />
             إضافة للطلب
           </Button>
         ) : (
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 md:gap-3">
             <Button
               onClick={onRemove}
               variant="outline"
               size="icon"
-              className="h-10 w-10 border-stone-200 hover:bg-stone-100 text-stone-500 rounded-lg active:scale-90 transition-all"
+              className="h-10 w-10 md:h-11 md:w-11 border-stone-200 hover:bg-stone-100 text-stone-500 rounded-lg active:scale-90 transition-all"
             >
-              <Minus className="h-4 w-4" />
+              <Minus className="h-4 w-4 md:h-5 md:w-5" />
             </Button>
-            <div className="text-xl font-bold flex-1 text-center text-stone-800 tabular-nums">
+            <div className="text-xl md:text-2xl font-bold flex-1 text-center text-stone-800 tabular-nums">
               {quantity}
             </div>
             <Button
               onClick={onAdd}
               size="icon"
-              className="h-10 w-10 bg-stone-800 hover:bg-stone-700 text-white rounded-lg shadow-sm active:scale-90 transition-all"
+              className="h-10 w-10 md:h-11 md:w-11 bg-stone-800 hover:bg-stone-700 text-white rounded-lg shadow-sm active:scale-90 transition-all"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 md:h-5 md:w-5" />
             </Button>
           </div>
         )}
