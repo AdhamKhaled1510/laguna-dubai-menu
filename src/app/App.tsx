@@ -140,6 +140,7 @@ const menuData: MenuItemType[] = [
   { id: 47, name: 'Nutella Frappe',      nameAr: 'فرابيه نوتيلا',    descriptionAr: 'فرابيه بالنوتيلا',   price: 65, image: IMG_FRAPPE,   category: 'frappe', popular: true  },
   { id: 48, name: 'Oreo Frappe',         nameAr: 'فرابيه أوريو',     descriptionAr: 'فرابيه بالأوريو',    price: 75, image: IMG_FRAPPE,   category: 'frappe', popular: false },
   { id: 49, name: 'Pistachio Frappe',    nameAr: 'فرابيه بيستاشيو',  descriptionAr: 'فرابيه بالفستق',     price: 70, image: IMG_FRAPPE,   category: 'frappe', popular: false },
+  { id: 190, name: 'Frappuccino',         nameAr: 'فرابتشينو',       descriptionAr: 'فرابتشينو',          price: 60, image: IMG_FRAPPE,   category: 'frappe', popular: false },
   // ════════════════════════════════════════
   //  اسموزي
   // ════════════════════════════════════════
