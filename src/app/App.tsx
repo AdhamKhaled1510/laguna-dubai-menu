@@ -6,7 +6,7 @@ import { Input } from './components/ui/input';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
 import logoUrl from '@/assets/logo.png';
-import { saveOrder } from './lib/orders';
+import { saveOrder, getNotifications, clearNotification } from './lib/orders';
 
 // ── Local menu images (from src/assets/menu/) ─────────────
 const _menuFiles = import.meta.glob('@/assets/menu/*.{jpg,png,webp}', {
@@ -305,6 +305,23 @@ export default function App() {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    let seen = new Set<string>();
+    const check = async () => {
+      const notifs = await getNotifications();
+      for (const n of notifs) {
+        if (!seen.has(n.id)) {
+          seen.add(n.id);
+          toast.success(`تم تجهيز طلب ترابيزة ${n.tableNumber}`);
+          clearNotification(n.id);
+        }
+      }
+    };
+    check();
+    const interval = setInterval(check, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   const saveCart = (newCart: CartItem[]) => {
