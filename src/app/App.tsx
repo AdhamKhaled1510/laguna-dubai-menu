@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Search } from 'lucide-react';
 import { MenuItem, MenuItemType } from './components/MenuItem';
 import { CartSheet } from './components/CartSheet';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
+
 import { Input } from './components/ui/input';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
@@ -278,21 +278,37 @@ interface CartItem {
   quantity: number;
 }
 
+function loadCart(): CartItem[] {
+  try {
+    const saved = localStorage.getItem('laguna-cart');
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return [];
+}
+
 export default function App() {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(loadCart);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('all');
+
+  const saveCart = (newCart: CartItem[]) => {
+    try {
+      localStorage.setItem('laguna-cart', JSON.stringify(newCart));
+    } catch {}
+  };
 
   const addToCart = (item: MenuItemType) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.item.id === item.id);
-      if (existingItem) {
-        return prevCart.map((cartItem) =>
-          cartItem.item.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      }
-      return [...prevCart, { item, quantity: 1 }];
+      const newCart = existingItem
+        ? prevCart.map((cartItem) =>
+            cartItem.item.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              : cartItem
+          )
+        : [...prevCart, { item, quantity: 1 }];
+      saveCart(newCart);
+      return newCart;
     });
     toast.success(`تم إضافة ${item.nameAr} للطلب`);
   };
@@ -300,25 +316,36 @@ export default function App() {
   const removeFromCart = (item: MenuItemType) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.item.id === item.id);
-      if (existingItem && existingItem.quantity > 1) {
-        return prevCart.map((cartItem) =>
-          cartItem.item.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity - 1 }
-            : cartItem
-        );
-      }
-      return prevCart.filter((cartItem) => cartItem.item.id !== item.id);
+      const newCart = existingItem && existingItem.quantity > 1
+        ? prevCart.map((cartItem) =>
+            cartItem.item.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity - 1 }
+              : cartItem
+          )
+        : prevCart.filter((cartItem) => cartItem.item.id !== item.id);
+      saveCart(newCart);
+      return newCart;
     });
   };
 
   const removeItemFromCart = (id: number) => {
-    setCart((prevCart) => prevCart.filter((cartItem) => cartItem.item.id !== id));
+    setCart((prevCart) => {
+      const newCart = prevCart.filter((cartItem) => cartItem.item.id !== id);
+      saveCart(newCart);
+      return newCart;
+    });
     toast.info('تم حذف الصنف من السلة');
   };
 
   const clearCart = () => {
     setCart([]);
+    saveCart([]);
     toast.info('تم إفراغ السلة');
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setActiveCategory(value);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCheckout = () => {
@@ -327,6 +354,7 @@ export default function App() {
     const msg = `مرحباً لاجونا دبي 🌊\nأود تقديم طلب:\n\n${orderItems}\n\nإجمالي الحساب: ${totalPrice} ج.م`;
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
     setCart([]);
+    saveCart([]);
   };
 
   const getItemQuantity = (itemId: number) => {
@@ -352,84 +380,104 @@ export default function App() {
 
   const categories = [
     { value: 'all',      label: 'الكل' },
-    { value: 'hot',      label: 'ساخن ☕' },
-    { value: 'iced',     label: 'بارد 🧊' },
-    { value: 'matcha',   label: 'ماتشا 🍵' },
+    { value: 'hot',      label: 'ساخن' },
+    { value: 'iced',     label: 'بارد' },
+    { value: 'matcha',   label: 'ماتشا' },
     { value: 'frappe',   label: 'فرابيه' },
     { value: 'milkshake',label: 'ميلك شيك' },
-    { value: 'yogurt',   label: 'زبادي 🍓' },
-    { value: 'juices',   label: 'عصائر 🥤' },
-    { value: 'cocktails',label: 'كوكتيل 🍹' },
+    { value: 'yogurt',   label: 'زبادي' },
+    { value: 'juices',   label: 'عصائر' },
+    { value: 'cocktails',label: 'كوكتيل' },
     { value: 'mojito',   label: 'موهيتو' },
-    { value: 'cans',     label: 'كانز 🥫' },
+    { value: 'cans',     label: 'كانز' },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 text-stone-700" dir="rtl">
+    <div className="min-h-screen bg-[#f5f0eb] text-stone-800" dir="rtl">
       <Toaster position="top-center" richColors />
 
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-xl shadow-sm sticky top-0 z-40 border-b border-rose-100/60">
-        <div className="container mx-auto px-4 py-5 flex flex-col items-center">
-          <div className="relative mb-3">
-            <div className="absolute inset-0 bg-gradient-to-r from-rose-200/30 via-pink-200/30 to-rose-200/30 rounded-full blur-3xl" />
-            <img src={logoUrl} alt="Laguna Dubai Logo" className="h-32 w-auto object-contain relative drop-shadow-lg" />
-          </div>
-          
-          <div className="text-center mb-5">
-            <h1 className="text-4xl font-black tracking-wide bg-gradient-to-r from-rose-600 to-pink-500 bg-clip-text text-transparent">Laguna Dubai</h1>
-            <p className="text-sm text-rose-300 uppercase tracking-[0.25em] mt-1.5 font-semibold">Café & Restaurant</p>
-          </div>
-
-          <div className="w-full max-w-md mx-auto relative">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-rose-300" />
+      <header className="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-stone-200/60 shadow-sm">
+        <div className="container mx-auto px-4 py-4 flex flex-col items-center">
+          <img src={logoUrl} alt="Laguna Dubai" className="h-20 w-auto mb-2" />
+          <h1 className="text-2xl font-bold tracking-[0.15em] text-stone-800" style={{ fontFamily: "'Playfair Display', serif" }}>LAGUNA DUBAI</h1>
+          <p className="text-xs text-stone-400 tracking-[0.3em] mt-1">CAFÉ &bull; RESTAURANT</p>
+          <div className="w-full max-w-md mx-auto mt-4 relative">
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
             <Input
               type="text"
               placeholder="ابحث في المنيو..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-12 text-right h-12 text-base bg-white/80 border-rose-200 text-stone-700 placeholder:text-rose-300 focus:border-rose-400 focus:ring-rose-400 rounded-xl shadow-sm backdrop-blur-sm"
+              className="pr-10 text-right h-10 text-sm bg-stone-50 border-stone-200 text-stone-700 placeholder:text-stone-400 focus:border-amber-700 focus:ring-amber-700/20 rounded-full shadow-sm"
             />
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-6 pb-32">
-        <Tabs defaultValue="all" className="w-full" dir="rtl">
-          <div className="overflow-x-auto pb-2 mb-6 scrollbar-hide">
-            <TabsList className="inline-flex gap-2 h-12 px-2 bg-rose-100/50 rounded-xl border border-rose-200/50 w-max min-w-full shadow-sm backdrop-blur-sm">
-              {categories.map((cat) => (
-                <TabsTrigger key={cat.value} value={cat.value} className="text-sm px-4 py-2 font-bold rounded-lg text-rose-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:to-pink-500 data-[state=active]:text-white transition-all">
-                  {cat.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+      {/* Category Navigation */}
+      <div className="sticky top-[132px] z-30 bg-[#f5f0eb]/90 backdrop-blur-md border-b border-stone-200/40">
+        <div className="container mx-auto px-4 py-3 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 w-max mx-auto">
+            {categories.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => handleCategoryChange(cat.value)}
+                className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeCategory === cat.value
+                    ? 'bg-stone-800 text-white shadow-md'
+                    : 'bg-white/70 text-stone-500 hover:bg-stone-100 border border-stone-200/50'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
           </div>
+        </div>
+      </div>
 
-          {categories.map((cat) => (
-            <TabsContent key={cat.value} value={cat.value} className="focus-visible:outline-none">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredItems(cat.value === 'all' ? undefined : cat.value).map((item) => (
-                  <MenuItem
-                    key={item.id}
-                    item={item}
-                    quantity={getItemQuantity(item.id)}
-                    onAdd={() => addToCart(item)}
-                    onRemove={() => removeFromCart(item)}
-                  />
-                ))}
-              </div>
-            </TabsContent>
+      {/* Items Grid */}
+      <main className="container mx-auto px-4 py-8 pb-32">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredItems(activeCategory === 'all' ? undefined : activeCategory).map((item) => (
+            <MenuItem
+              key={item.id}
+              item={item}
+              quantity={getItemQuantity(item.id)}
+              onAdd={() => addToCart(item)}
+              onRemove={() => removeFromCart(item)}
+            />
           ))}
-        </Tabs>
+        </div>
 
-        {filteredItems().length === 0 && (
+        {filteredItems(activeCategory === 'all' ? undefined : activeCategory).length === 0 && (
           <div className="text-center py-20">
-            <p className="text-xl text-rose-300">لا توجد نتائج للبحث</p>
+            <p className="text-xl text-stone-400">لا توجد نتائج للبحث</p>
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="bg-stone-900 text-stone-400 py-10 px-4">
+        <div className="container mx-auto max-w-4xl text-center">
+          <img src={logoUrl} alt="Laguna Dubai" className="h-14 w-auto mx-auto mb-4 opacity-60" />
+          <p className="text-lg font-semibold text-stone-300 mb-1">LAGUNA DUBAI</p>
+          <p className="text-sm text-stone-500 mb-4">CAFÉ &bull; RESTAURANT</p>
+          <p className="text-sm text-stone-500 max-w-md mx-auto leading-relaxed mb-6">
+            دبي &bull; الإمارات العربية المتحدة
+          </p>
+          <div className="flex justify-center gap-4 text-sm text-stone-500">
+            <a href={`https://wa.me/${WA_NUMBER}`} className="hover:text-amber-400 transition-colors">واتساب</a>
+            <span>&bull;</span>
+            <span>+20 123 456 7890</span>
+            <span>&bull;</span>
+            <span> laguna.dubai@email.com</span>
+          </div>
+          <div className="mt-8 pt-6 border-t border-stone-800 text-xs text-stone-600">
+            &copy; 2026 Laguna Dubai. جميع الحقوق محفوظة.
+          </div>
+        </div>
+      </footer>
 
       {/* Cart */}
       <CartSheet

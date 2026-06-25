@@ -25,54 +25,54 @@ interface MenuItemProps {
 
 export function MenuItem({ item, quantity, onAdd, onRemove }: MenuItemProps) {
   return (
-    <Card className="overflow-hidden bg-white/90 backdrop-blur-sm border-rose-100 hover:border-rose-300 hover:shadow-xl hover:shadow-rose-200/20 transition-all duration-300 text-stone-700 rounded-2xl">
-      <div className="relative h-48 overflow-hidden">
+    <Card className="overflow-hidden bg-white border-stone-100 hover:border-stone-200 hover:shadow-xl hover:shadow-stone-900/5 transition-all duration-300 text-stone-800 rounded-xl">
+      <div className="relative h-44 overflow-hidden">
         <ImageWithFallback
           src={item.image}
           alt={item.nameAr}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
         />
         {item.popular && (
-          <Badge className="absolute top-2 right-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold shadow-md">
+          <Badge className="absolute top-3 right-3 bg-stone-800 text-white text-xs font-medium shadow-md px-3 py-1 rounded-full">
             الأكثر طلباً
           </Badge>
         )}
       </div>
       <CardContent className="p-4">
         <div className="text-right mb-3">
-          <h3 className="text-lg font-bold mb-1 text-stone-700">{item.nameAr}</h3>
-          <p className="text-sm text-rose-300 mb-2 line-clamp-2">
+          <h3 className="text-base font-bold mb-1 text-stone-800">{item.nameAr}</h3>
+          <p className="text-xs text-stone-400 mb-2 leading-relaxed">
             {item.descriptionAr}
           </p>
-          <div className="text-xl font-black bg-gradient-to-r from-rose-600 to-pink-500 bg-clip-text text-transparent">
-            {item.price} ج.م
+          <div className="text-lg font-bold text-stone-800">
+            {item.price} <span className="text-xs font-normal text-stone-400">ج.م</span>
           </div>
         </div>
 
         {quantity === 0 ? (
-          <Button onClick={onAdd} className="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 text-white font-bold h-11 rounded-xl shadow-sm" size="lg">
-            <Plus className="ml-2 h-5 w-5" />
+          <Button onClick={onAdd} className="w-full bg-stone-800 hover:bg-stone-700 text-white font-medium h-10 rounded-lg text-sm transition-colors" size="lg">
+            <Plus className="ml-1.5 h-4 w-4" />
             إضافة للطلب
           </Button>
         ) : (
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-2">
             <Button
               onClick={onRemove}
               variant="outline"
               size="icon"
-              className="h-11 w-11 border-rose-200 hover:bg-rose-50 text-rose-400"
+              className="h-10 w-10 border-stone-200 hover:bg-stone-100 text-stone-500 rounded-lg"
             >
-              <Minus className="h-5 w-5" />
+              <Minus className="h-4 w-4" />
             </Button>
-            <div className="text-2xl font-bold flex-1 text-center text-stone-700">
+            <div className="text-xl font-bold flex-1 text-center text-stone-800">
               {quantity}
             </div>
             <Button
               onClick={onAdd}
               size="icon"
-              className="h-11 w-11 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 text-white shadow-sm"
+              className="h-10 w-10 bg-stone-800 hover:bg-stone-700 text-white rounded-lg shadow-sm"
             >
-              <Plus className="h-5 w-5" />
+              <Plus className="h-4 w-4" />
             </Button>
           </div>
         )}

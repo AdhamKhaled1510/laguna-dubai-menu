@@ -26,47 +26,47 @@ export function CartSheet({ cartItems, onRemoveItem, onClearCart, onCheckout }: 
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button size="lg" className="fixed bottom-6 left-6 h-16 px-8 text-lg bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 text-white font-black shadow-xl rounded-2xl z-50 transition-transform duration-300 active:scale-95">
-          <ShoppingCart className="ml-2 h-6 w-6" />
+        <Button size="lg" className="fixed bottom-6 left-6 h-14 px-6 text-base bg-stone-800 hover:bg-stone-700 text-white font-bold shadow-xl rounded-xl z-50 transition-all duration-300 active:scale-95">
+          <ShoppingCart className="ml-2 h-5 w-5" />
           السلة ({totalItems})
           {totalPrice > 0 && (
-            <Badge variant="secondary" className="mr-3 text-base px-3 py-1 bg-white/20 text-white border border-white/30">
+            <Badge variant="secondary" className="mr-2 text-sm px-2.5 py-0.5 bg-stone-700 text-stone-200 border border-stone-600">
               {totalPrice} ج.م
             </Badge>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-full sm:max-w-lg flex flex-col bg-gradient-to-b from-white to-rose-50/30 border-r border-rose-100 text-stone-700">
-        <SheetHeader className="text-right flex flex-col items-center">
-          <img src={logoUrl} alt="Laguna Dubai" className="h-16 w-auto mb-2" />
-          <SheetTitle className="text-2xl font-black bg-gradient-to-r from-rose-600 to-pink-500 bg-clip-text text-transparent">سلة الطلبات</SheetTitle>
+      <SheetContent side="left" className="w-full sm:max-w-lg flex flex-col bg-white border-l border-stone-100 text-stone-800">
+        <SheetHeader className="text-right flex flex-col items-center pt-6">
+          <img src={logoUrl} alt="Laguna Dubai" className="h-14 w-auto mb-2" />
+          <SheetTitle className="text-lg font-bold text-stone-800">سلة الطلبات</SheetTitle>
         </SheetHeader>
 
         {cartItems.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <img src={logoUrl} alt="Laguna Dubai" className="h-24 w-auto mx-auto mb-4 opacity-15" />
-              <p className="text-xl font-bold text-rose-300">السلة فارغة</p>
-              <p className="text-sm mt-2 text-rose-200">ابدأ بإضافة مشروبات لذيذة من المنيو</p>
+              <img src={logoUrl} alt="Laguna Dubai" className="h-20 w-auto mx-auto mb-4 opacity-10" />
+              <p className="text-lg font-semibold text-stone-400">السلة فارغة</p>
+              <p className="text-sm mt-1 text-stone-300">ابدأ بإضافة مشروبات لذيذة من المنيو</p>
             </div>
           </div>
         ) : (
           <>
             <ScrollArea className="flex-1 -mx-6 px-6 my-4">
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {cartItems.map(({ item, quantity }) => (
-                  <div key={item.id} className="flex gap-4 p-3 bg-white/80 backdrop-blur-sm border border-rose-100 rounded-xl">
+                  <div key={item.id} className="flex gap-3 p-3 bg-stone-50 border border-stone-100 rounded-lg">
                     <img
                       src={item.image}
                       alt={item.nameAr}
-                      className="w-20 h-20 object-cover rounded-lg border border-rose-100"
+                      className="w-16 h-16 object-cover rounded-lg"
                     />
                     <div className="flex-1 text-right">
-                      <h4 className="font-bold text-stone-700 mb-1">{item.nameAr}</h4>
-                      <div className="text-sm text-rose-300 mb-2">
+                      <h4 className="font-semibold text-sm text-stone-800 mb-1">{item.nameAr}</h4>
+                      <div className="text-xs text-stone-400 mb-1">
                         {item.price} ج.م × {quantity}
                       </div>
-                      <div className="font-black bg-gradient-to-r from-rose-600 to-pink-500 bg-clip-text text-transparent">
+                      <div className="font-bold text-stone-800 text-sm">
                         {item.price * quantity} ج.م
                       </div>
                     </div>
@@ -74,23 +74,23 @@ export function CartSheet({ cartItems, onRemoveItem, onClearCart, onCheckout }: 
                       variant="ghost"
                       size="icon"
                       onClick={() => onRemoveItem(item.id)}
-                      className="h-8 w-8 text-red-300 hover:text-red-400 hover:bg-red-50"
+                      className="h-7 w-7 text-stone-300 hover:text-red-400 hover:bg-red-50"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
                 ))}
               </div>
             </ScrollArea>
 
-            <Separator className="my-4 bg-rose-100" />
+            <Separator className="my-3 bg-stone-100" />
 
-            <div className="space-y-3 text-right mb-4">
-              <div className="flex justify-between text-lg">
-                <span className="font-black bg-gradient-to-r from-rose-600 to-pink-500 bg-clip-text text-transparent">{totalPrice} ج.م</span>
-                <span className="text-rose-400">المجموع:</span>
+            <div className="space-y-2 text-right mb-4 px-1">
+              <div className="flex justify-between text-sm">
+                <span className="font-bold text-stone-800">{totalPrice} ج.م</span>
+                <span className="text-stone-500">المجموع:</span>
               </div>
-              <div className="flex justify-between text-sm text-rose-300">
+              <div className="flex justify-between text-xs text-stone-400">
                 <span>{totalItems}</span>
                 <span>عدد الأصناف:</span>
               </div>
@@ -100,17 +100,17 @@ export function CartSheet({ cartItems, onRemoveItem, onClearCart, onCheckout }: 
               <Button
                 onClick={onCheckout}
                 size="lg"
-                className="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 text-white font-black text-lg h-14 rounded-xl shadow-sm"
+                className="w-full bg-stone-800 hover:bg-stone-700 text-white font-bold text-sm h-12 rounded-lg"
               >
-                تأكيد الطلب وإرسال لواتساب
+                تأكيد الطلب
               </Button>
               <Button
                 onClick={onClearCart}
                 variant="outline"
                 size="lg"
-                className="w-full border-rose-200 hover:bg-rose-50 text-rose-400"
+                className="w-full border-stone-200 hover:bg-stone-100 text-stone-500 text-sm h-11 rounded-lg"
               >
-                <Trash2 className="ml-2 h-5 w-5" />
+                <Trash2 className="ml-2 h-4 w-4" />
                 إفراغ السلة
               </Button>
             </SheetFooter>
