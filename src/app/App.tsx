@@ -6,7 +6,7 @@ import { Input } from './components/ui/input';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
 import logoUrl from '@/assets/logo.png';
-import { saveOrder, getNotifications, clearNotification } from './lib/orders';
+import { saveOrder, getNotifications, clearNotification, getOrders, Order } from './lib/orders';
 
 // ── Local menu images (from src/assets/menu/) ─────────────
 const _menuFiles = import.meta.glob('@/assets/menu/*.{jpg,png,webp}', {
@@ -288,10 +288,14 @@ function loadCart(): CartItem[] {
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>(loadCart);
   const [tableNumber, setTableNumber] = useState(1);
+  const [tablePopupOpen, setTablePopupOpen] = useState(false);
+  const [completedOpen, setCompletedOpen] = useState(false);
+  const [completedOrders, setCompletedOrders] = useState<Order[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('hot');
   const [headerVisible, setHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -322,6 +326,26 @@ export default function App() {
     check();
     const interval = setInterval(check, 3000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchCompleted = async () => {
+      const all = await getOrders();
+      setCompletedOrders(all.filter(o => o.status === 'completed').sort((a, b) => b.timestamp - a.timestamp));
+    };
+    fetchCompleted();
+    const interval = setInterval(fetchCompleted, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (tableRef.current && !tableRef.current.contains(e.target as Node)) {
+        setTablePopupOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   const saveCart = (newCart: CartItem[]) => {
@@ -447,32 +471,15 @@ export default function App() {
           <h1 className="text-xl md:text-2xl font-bold tracking-[0.15em] text-white" style={{ fontFamily: "'Playfair Display', serif" }}>LAGUNA DUBAI</h1>
           <p className="text-[10px] md:text-xs text-white/50 tracking-[0.3em] mt-1">CAFÉ &bull; RESTAURANT</p>
 
-          {/* Table Number */}
-          <div className="flex flex-col items-center mt-2">
-            <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-3 py-1.5">
-              <span className="text-[10px] text-white/50 tracking-wider">TABLE</span>
-              <span className="text-lg font-bold text-amber-400 mx-1 tabular-nums">{tableNumber.toString().padStart(2, '0')}</span>
-              <div className="flex gap-0.5">
-                <button onClick={() => setTableNumber(Math.max(1, tableNumber - 1))} className="w-6 h-6 flex items-center justify-center rounded-md bg-white/10 hover:bg-white/20 text-white text-xs transition-colors">−</button>
-                <button onClick={() => setTableNumber(Math.min(20, tableNumber + 1))} className="w-6 h-6 flex items-center justify-center rounded-md bg-white/10 hover:bg-white/20 text-white text-xs transition-colors">+</button>
-              </div>
-            </div>
-            <div className="flex gap-1.5 mt-1.5">
-              {[1,2,3,4,5,6,7,8,9,10,15,20].map(n => (
-                <button
-                  key={n}
-                  onClick={() => setTableNumber(n)}
-                  className={`w-7 h-6 text-[10px] font-bold rounded-md transition-colors ${
-                    tableNumber === n
-                      ? 'bg-amber-500 text-stone-900'
-                      : 'bg-white/10 text-white/60 hover:bg-white/20'
-                  }`}
-                >
-                  {n}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Table Number Button */}
+          <button
+            onClick={() => setTablePopupOpen(true)}
+            className="mt-2 flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-4 py-1.5 transition-colors"
+          >
+            <span className="text-[10px] text-white/50 tracking-wider">TABLE</span>
+            <span className="text-lg font-bold text-amber-400 tabular-nums">{tableNumber.toString().padStart(2, '0')}</span>
+            <svg className="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 8l4 4 4-4"/></svg>
+          </button>
 
           <div className="w-full max-w-md mx-auto mt-3 md:mt-4 relative">
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
@@ -568,6 +575,82 @@ export default function App() {
         onClearCart={clearCart}
         onCheckout={handleCheckout}
       />
+
+      {/* Table Popup */}
+      {tablePopupOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/40 z-50" onClick={() => setTablePopupOpen(false)} />
+          <div ref={tableRef} className="fixed bottom-0 left-0 right-0 z-50 bg-[#f5f0eb] rounded-t-2xl shadow-2xl p-6 animate-slide-up" style={{animation: 'slideUp 0.25s ease-out'}}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-stone-800">اختر رقم التربيزة</h2>
+              <button onClick={() => setTablePopupOpen(false)} className="text-stone-400 hover:text-stone-600">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div className="grid grid-cols-5 gap-3">
+              {Array.from({ length: 20 }, (_, i) => i + 1).map(n => (
+                <button
+                  key={n}
+                  onClick={() => { setTableNumber(n); setTablePopupOpen(false); }}
+                  className={`h-14 rounded-xl font-bold text-lg transition-all ${
+                    tableNumber === n
+                      ? 'bg-amber-500 text-stone-900 shadow-lg shadow-amber-500/30 scale-105'
+                      : 'bg-white text-stone-700 border border-stone-200 hover:border-amber-400/40 hover:shadow-md'
+                  }`}
+                >
+                  {n.toString().padStart(2, '0')}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Completed Orders FAB + Sheet */}
+      {completedOrders.length > 0 && (
+        <button
+          onClick={() => setCompletedOpen(true)}
+          className="fixed bottom-24 left-4 z-40 flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-4 py-3 shadow-xl transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span className="text-sm font-bold">{completedOrders.length}</span>
+        </button>
+      )}
+
+      {completedOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/40 z-50" onClick={() => setCompletedOpen(false)} />
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#f5f0eb] rounded-t-2xl shadow-2xl p-6 max-h-[70vh] overflow-y-auto" style={{animation: 'slideUp 0.25s ease-out'}}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-stone-800">الطلبات المكتملة</h2>
+              <button onClick={() => setCompletedOpen(false)} className="text-stone-400 hover:text-stone-600">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            {completedOrders.length === 0 ? (
+              <p className="text-center text-stone-400 py-8">لا توجد طلبات مكتملة</p>
+            ) : (
+              <div className="space-y-2">
+                {completedOrders.slice(0, 50).map((order, idx) => (
+                  <div key={order.id || idx} className="bg-white rounded-xl p-4 border border-stone-100 flex items-center justify-between">
+                    <div>
+                      <span className="text-amber-600 font-bold text-lg">ترابيزة {order.tableNumber}</span>
+                      <div className="text-xs text-stone-400 mt-0.5">
+                        {order.items?.slice(0, 3).map(i => i.nameAr).join(' • ')}
+                        {(order.items?.length ?? 0) > 3 && ' • ...'}
+                      </div>
+                    </div>
+                    <div className="text-left">
+                      <div className="text-xs text-stone-400">{new Date(order.timestamp).toLocaleTimeString('ar-EG', {hour:'2-digit',minute:'2-digit'})}</div>
+                      <div className="text-xs font-bold text-emerald-600">مكتمل ✓</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
