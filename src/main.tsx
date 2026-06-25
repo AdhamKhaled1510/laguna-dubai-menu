@@ -1,16 +1,16 @@
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from 'react-router';
+import { HashRouter, Routes, Route } from 'react-router';
 import StaffLogin from "./app/StaffLogin";
 import WaiterPage from "./app/App";
 import BaristaPage from "./app/BaristaPage";
 import "./styles/index.css";
 
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter basename="/laguna-dubai1510">
+  <HashRouter>
     <Routes>
       <Route path="/" element={<StaffLogin />} />
       <Route path="/waiter" element={<WaiterPage />} />
       <Route path="/barista" element={<BaristaPage />} />
     </Routes>
-  </BrowserRouter>
+  </HashRouter>
 );
