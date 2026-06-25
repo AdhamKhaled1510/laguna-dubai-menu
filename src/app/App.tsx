@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Phone, MessageCircle, MapPin, ChevronDown } from 'lucide-react';
+import { Search, Phone, MessageCircle, MapPin } from 'lucide-react';
 import { MenuItem, MenuItemType } from './components/MenuItem';
 import { CartSheet } from './components/CartSheet';
 import { Input } from './components/ui/input';
@@ -500,29 +500,22 @@ export default function App() {
         }`}
       >
         <div className="container mx-auto px-4 md:px-6 py-4 flex flex-col gap-3">
-          {/* Top row: Logo+Name (left) · Search button (right) */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img src={logoUrl} alt="Laguna Dubai" className="h-10 md:h-12 w-auto brightness-0 invert" />
-              <div>
-                <h1 className="text-lg md:text-xl font-bold tracking-wide text-white leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>LAGUNA DUBAI</h1>
-                <p className="text-[9px] md:text-[10px] text-white/40 tracking-[0.2em]">CAFÉ &bull; RESTAURANT</p>
-              </div>
-            </div>
-
-            {/* Search Icon Button + Floating Box */}
-            <div className="relative" ref={searchRef}>
+          {/* Top row: Search (right) · Logo+Name (left) */}
+          <div className="flex items-center justify-between gap-3">
+            {/* Search — on the right in RTL */}
+            <div className="relative flex-1 max-w-xs" ref={searchRef}>
               <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
+                onClick={() => setSearchOpen(true)}
+                className="w-full flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-4 py-2.5 transition-colors"
               >
-                <Search className="h-4 w-4 text-white/60" />
+                <Search className="h-4 w-4 text-white/40" />
+                <span className="text-sm text-white/40">ابحث في القائمة...</span>
               </button>
 
               {searchOpen && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setSearchOpen(false)} />
-                  <div className="absolute left-0 md:left-auto md:right-0 top-12 z-40 w-[280px] md:w-80 bg-white rounded-2xl shadow-2xl border border-stone-100 p-3" style={{animation: 'fadeIn 0.15s ease-out'}}>
+                  <div className="absolute left-0 right-0 top-12 z-40 bg-white rounded-2xl shadow-2xl border border-stone-100 p-3" style={{animation: 'fadeIn 0.15s ease-out'}}>
                     <div className="relative">
                       <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-300" />
                       <Input
@@ -535,39 +528,32 @@ export default function App() {
                       />
                       {searchQuery && (
                         <button
-                          onClick={() => setSearchQuery('')}
+                          onClick={() => { setSearchQuery(''); setSearchOpen(false); }}
                           className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-stone-200 hover:bg-stone-300 text-stone-500 text-xs transition-colors"
                         >
                           ✕
                         </button>
                       )}
                     </div>
-                    {searchQuery && (
-                      <p className="text-xs text-stone-400 mt-2 text-right">
-                        يتم البحث في جميع الأقسام
-                      </p>
-                    )}
                   </div>
                 </>
               )}
             </div>
-          </div>
 
-          {/* Bottom row: Table number */}
-          <button
-            onClick={() => setTablePopupOpen(true)}
-            className="self-start flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-4 py-2 transition-colors"
-          >
-            <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            <span className="text-sm text-white/60">TABLE</span>
-            <span className="text-lg font-bold text-amber-400 tabular-nums">{tableNumber.toString().padStart(2, '0')}</span>
-            <svg className="w-3 h-3 text-white/40" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 8l4 4 4-4"/></svg>
-          </button>
+            {/* Logo+Name — on the left in RTL */}
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="text-right">
+                <h1 className="text-sm md:text-base font-bold tracking-wide text-white leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>LAGUNA DUBAI</h1>
+                <p className="text-[8px] md:text-[9px] text-white/40 tracking-[0.15em]">CAFÉ &bull; RESTAURANT</p>
+              </div>
+              <img src={logoUrl} alt="Laguna Dubai" className="h-9 md:h-10 w-auto brightness-0 invert" />
+            </div>
+          </div>
         </div>
       </header>
 
       {/* Category Navigation */}
-      <div className={`sticky z-30 bg-white border-b border-stone-100 shadow-sm ${headerVisible ? 'top-[124px] md:top-[136px]' : 'top-0'}`}>
+      <div className={`sticky z-30 bg-white border-b border-stone-100 shadow-sm ${headerVisible ? 'top-[68px] md:top-[76px]' : 'top-0'}`}>
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex gap-0 overflow-x-auto scrollbar-hide -mb-px">
             {categories.map((cat) => (
@@ -643,6 +629,8 @@ export default function App() {
       {/* Cart */}
       <CartSheet
         cartItems={cart}
+        tableNumber={tableNumber}
+        setTableNumber={setTableNumber}
         onRemoveItem={removeItemFromCart}
         onClearCart={clearCart}
         onCheckout={handleCheckout}

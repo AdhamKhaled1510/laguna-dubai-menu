@@ -14,12 +14,14 @@ interface CartItem {
 
 interface CartSheetProps {
   cartItems: CartItem[];
+  tableNumber: number;
+  setTableNumber: (n: number) => void;
   onRemoveItem: (id: number) => void;
   onClearCart: () => void;
   onCheckout: () => void;
 }
 
-export function CartSheet({ cartItems, onRemoveItem, onClearCart, onCheckout }: CartSheetProps) {
+export function CartSheet({ cartItems, tableNumber, setTableNumber, onRemoveItem, onClearCart, onCheckout }: CartSheetProps) {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cartItems.reduce((sum, item) => sum + item.item.price * item.quantity, 0);
 
@@ -40,6 +42,24 @@ export function CartSheet({ cartItems, onRemoveItem, onClearCart, onCheckout }: 
         <SheetHeader className="text-right flex flex-col items-center pt-6 pb-2 border-b border-stone-100">
           <img src={logoUrl} alt="Laguna Dubai" className="h-10 w-auto mb-2 brightness-0" />
           <SheetTitle className="text-lg font-bold text-stone-800">سلة الطلبات</SheetTitle>
+          <div className="flex items-center gap-2 mt-3 w-full">
+            <span className="text-xs text-stone-400 shrink-0">ترابيزة</span>
+            <div className="flex gap-1 flex-wrap">
+              {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20].map(n => (
+                <button
+                  key={n}
+                  onClick={() => setTableNumber(n)}
+                  className={`w-8 h-8 text-xs font-bold rounded-lg transition-all ${
+                    tableNumber === n
+                      ? 'bg-amber-500 text-white shadow-sm'
+                      : 'bg-stone-50 text-stone-500 hover:bg-stone-100 border border-stone-200'
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
         </SheetHeader>
 
         {cartItems.length === 0 ? (
