@@ -331,7 +331,12 @@ export default function App() {
   useEffect(() => {
     const fetchCompleted = async () => {
       const all = await getOrders();
-      setCompletedOrders(all.filter(o => o.status === 'completed').sort((a, b) => b.timestamp - a.timestamp));
+      const cutoff = Date.now() - 15 * 60 * 1000;
+      setCompletedOrders(
+        all
+          .filter(o => o.status === 'completed' && o.timestamp > cutoff)
+          .sort((a, b) => b.timestamp - a.timestamp)
+      );
     };
     fetchCompleted();
     const interval = setInterval(fetchCompleted, 3000);
@@ -492,26 +497,26 @@ export default function App() {
             />
           </div>
         </div>
-        <svg className="absolute bottom-0 left-0 w-full h-6 -mb-[1px] text-[#f5f0eb]" viewBox="0 0 1440 48" preserveAspectRatio="none" fill="currentColor">
-          <path d="M0 48h1440V24c-120-24-360-40-720-24S120 48 0 24v24z"/>
-        </svg>
       </header>
 
       {/* Category Navigation */}
-      <div className={`sticky z-30 bg-[#f5f0eb]/95 backdrop-blur-md border-b border-stone-200/40 shadow-sm ${headerVisible ? 'top-[116px] md:top-[132px]' : 'top-0'}`}>
-        <div className="container mx-auto px-4 md:px-6 py-3 overflow-x-auto scrollbar-hide">
-          <div className="flex gap-2 md:gap-3 w-max mx-auto">
+      <div className={`sticky z-30 bg-white border-b border-stone-100 shadow-sm ${headerVisible ? 'top-[76px] md:top-[88px]' : 'top-0'}`}>
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex gap-0 overflow-x-auto scrollbar-hide -mb-px">
             {categories.map((cat) => (
               <button
                 key={cat.value}
                 onClick={() => handleCategoryChange(cat.value)}
-                className={`whitespace-nowrap px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm md:text-base font-medium transition-all duration-200 ${
+                className={`relative whitespace-nowrap px-5 py-3 text-sm font-medium transition-colors ${
                   activeCategory === cat.value
-                    ? 'bg-stone-800 text-white shadow-md'
-                    : 'bg-white/70 text-stone-500 hover:bg-stone-100 border border-stone-200/50'
+                    ? 'text-stone-900'
+                    : 'text-stone-400 hover:text-stone-600'
                 }`}
               >
                 {cat.label}
+                {activeCategory === cat.value && (
+                  <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-stone-800 rounded-full" />
+                )}
               </button>
             ))}
           </div>
