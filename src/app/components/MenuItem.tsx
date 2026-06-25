@@ -42,7 +42,7 @@ export function MenuItem({ item, quantity, onAdd, onRemove }: MenuItemProps) {
         <div className="mb-3">
           <div className="flex justify-between items-start gap-2">
             <h3 className="text-base font-bold text-stone-800">{item.nameAr}</h3>
-            <span className="text-sm font-bold text-stone-800 bg-[#0A2242] text-white px-2.5 py-0.5 shrink-0">{item.price}</span>
+            <span className="text-sm font-bold text-stone-500 shrink-0">{item.price} ج.م</span>
           </div>
           <p className="text-xs text-stone-400 leading-relaxed line-clamp-2 text-right mt-1">
             {item.descriptionAr}
