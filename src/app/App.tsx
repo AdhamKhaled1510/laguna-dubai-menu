@@ -499,13 +499,13 @@ export default function App() {
           headerVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
-        <div className="container mx-auto px-4 md:px-6 py-5 md:py-6 flex items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-4 md:px-8 py-5 md:py-6 flex items-center justify-between gap-4">
           {/* Logo+Name */}
-          <div className="flex items-center gap-3">
-            <img src={logoUrl} alt="Laguna Dubai" className="h-14 md:h-20 w-auto brightness-0 invert" />
+          <div className="flex items-center gap-3 md:gap-4">
+            <img src={logoUrl} alt="Laguna Dubai" className="h-14 md:h-20 lg:h-24 w-auto brightness-0 invert" />
             <div className="text-right">
-              <h1 className="text-xl md:text-2xl font-bold tracking-wide text-white leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>LAGUNA DUBAI</h1>
-              <p className="text-[10px] md:text-xs text-white/40 tracking-[0.2em]">CAFÉ &bull; RESTAURANT</p>
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-wide text-white leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>LAGUNA DUBAI</h1>
+              <p className="text-[10px] md:text-xs lg:text-sm text-white/40 tracking-[0.2em]">CAFÉ &bull; RESTAURANT</p>
             </div>
           </div>
 
@@ -549,7 +549,7 @@ export default function App() {
       </header>
 
       {/* Main Content with sidebar */}
-      <main className="container mx-auto px-4 md:px-6 py-6 md:py-8 pb-32 relative">
+      <main className="max-w-6xl mx-auto px-4 md:px-8 py-6 md:py-8 lg:py-10 pb-32 relative">
         {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-amber-200/20 rounded-full blur-3xl animate-pulse" style={{animationDuration: '8s'}} />
@@ -557,14 +557,14 @@ export default function App() {
           <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-amber-100/15 rounded-full blur-3xl animate-pulse" style={{animationDuration: '10s'}} />
         </div>
 
-        <div className="flex gap-6 md:gap-8">
-          {/* Categories Sidebar (left) */}
-          <aside className="hidden md:flex flex-col gap-1 shrink-0 sticky top-24 self-start">
+        <div className="flex gap-6 lg:gap-10">
+          {/* Categories Sidebar (iPad+) */}
+          <aside className="hidden md:flex flex-col gap-1 shrink-0 sticky top-28 self-start w-28 lg:w-32">
             {categories.map((cat) => (
               <button
                 key={cat.value}
                 onClick={() => handleCategoryChange(cat.value)}
-                className={`text-right whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`text-right whitespace-nowrap px-4 lg:px-5 py-3 rounded-xl text-sm lg:text-base font-medium transition-all duration-200 ${
                   activeCategory === cat.value
                     ? 'bg-stone-800 text-white shadow-md shadow-stone-800/20'
                     : 'text-stone-500 hover:text-stone-700 hover:bg-white/60'
@@ -594,7 +594,7 @@ export default function App() {
 
           {/* Items Grid */}
           <div className="flex-1 min-w-0">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
           {filteredItems(activeCategory).map((item, idx) => (
             <MenuItem
               key={item.id}

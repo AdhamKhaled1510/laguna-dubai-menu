@@ -38,18 +38,18 @@ export function CartSheet({ cartItems, tableNumber, setTableNumber, onRemoveItem
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-full sm:max-w-lg flex flex-col bg-white border-l border-stone-100 text-stone-800">
-        <SheetHeader className="text-right flex flex-col items-center pt-6 pb-2 border-b border-stone-100">
-          <img src={logoUrl} alt="Laguna Dubai" className="h-10 w-auto mb-2 brightness-0" />
-          <SheetTitle className="text-lg font-bold text-stone-800">سلة الطلبات</SheetTitle>
-          <div className="flex items-center gap-2 mt-3 w-full">
-            <span className="text-xs text-stone-400 shrink-0">ترابيزة</span>
-            <div className="flex gap-1 flex-wrap">
+      <SheetContent side="left" className="w-full sm:max-w-lg md:max-w-xl flex flex-col bg-white border-l border-stone-100 text-stone-800">
+        <SheetHeader className="text-right flex flex-col items-center pt-6 md:pt-8 pb-2 border-b border-stone-100">
+          <img src={logoUrl} alt="Laguna Dubai" className="h-10 md:h-12 w-auto mb-2 brightness-0" />
+          <SheetTitle className="text-lg md:text-xl font-bold text-stone-800">سلة الطلبات</SheetTitle>
+          <div className="flex items-center gap-2 mt-3 md:mt-4 w-full">
+            <span className="text-xs md:text-sm text-stone-400 shrink-0">ترابيزة</span>
+            <div className="flex gap-1.5 flex-wrap">
               {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20].map(n => (
                 <button
                   key={n}
                   onClick={() => setTableNumber(n)}
-                  className={`w-8 h-8 text-xs font-bold rounded-lg transition-all ${
+                  className={`w-8 h-8 md:w-9 md:h-9 text-xs md:text-sm font-bold rounded-lg transition-all ${
                     tableNumber === n
                       ? 'bg-amber-500 text-white shadow-sm'
                       : 'bg-stone-50 text-stone-500 hover:bg-stone-100 border border-stone-200'
@@ -77,18 +77,18 @@ export function CartSheet({ cartItems, tableNumber, setTableNumber, onRemoveItem
             <ScrollArea className="flex-1 -mx-6 px-6 my-4">
               <div className="space-y-3">
                 {cartItems.map(({ item, quantity }) => (
-                  <div key={item.id} className="flex gap-3 p-3 bg-stone-50 border border-stone-100 rounded-lg hover:border-stone-200 transition-colors">
+                  <div key={item.id} className="flex gap-3 md:gap-4 p-3 md:p-4 bg-stone-50 border border-stone-100 rounded-lg hover:border-stone-200 transition-colors">
                     <img
                       src={item.image}
                       alt={item.nameAr}
-                      className="w-16 h-16 object-cover rounded-lg"
+                      className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg"
                     />
                     <div className="flex-1 text-right">
-                      <h4 className="font-semibold text-sm text-stone-800 mb-1">{item.nameAr}</h4>
-                      <div className="text-xs text-stone-400 mb-1">
+                      <h4 className="font-semibold text-sm md:text-base text-stone-800 mb-1">{item.nameAr}</h4>
+                      <div className="text-xs md:text-sm text-stone-400 mb-1">
                         {item.price} ج.م × {quantity}
                       </div>
-                      <div className="font-bold text-stone-800 text-sm">
+                      <div className="font-bold text-stone-800 text-sm md:text-base">
                         {item.price * quantity} ج.م
                       </div>
                     </div>
@@ -96,9 +96,9 @@ export function CartSheet({ cartItems, tableNumber, setTableNumber, onRemoveItem
                       variant="ghost"
                       size="icon"
                       onClick={() => onRemoveItem(item.id)}
-                      className="h-8 w-8 md:h-9 md:w-9 text-stone-300 hover:text-red-400 hover:bg-red-50"
+                      className="h-8 w-8 md:h-10 md:w-10 text-stone-300 hover:text-red-400 hover:bg-red-50"
                     >
-                      <Trash2 className="h-4 w-4 md:h-4.5 md:w-4.5" />
+                      <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
                     </Button>
                   </div>
                 ))}
