@@ -510,13 +510,12 @@ export default function App() {
           </div>
 
           {/* Search */}
-          <div className="relative w-full max-w-[200px] md:max-w-xs" ref={searchRef}>
+          <div className="relative" ref={searchRef}>
             <button
               onClick={() => setSearchOpen(true)}
-              className="w-full flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-4 py-2.5 transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
             >
-              <Search className="h-4 w-4 text-white/40 shrink-0" />
-              <span className="text-sm text-white/40 truncate">ابحث في القائمة...</span>
+              <Search className="h-4 w-4 text-white/60" />
             </button>
 
             {searchOpen && (
