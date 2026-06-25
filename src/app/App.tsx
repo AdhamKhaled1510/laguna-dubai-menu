@@ -206,6 +206,7 @@ const menuData: MenuItemType[] = [
   { id: 124, name: 'Sun Shine',         nameAr: 'موهيتو صن شاين',    descriptionAr: 'موهيتو صن شاين',        price: 60,  image: IMG_MOJITO,   category: 'mojito', popular: false },
   { id: 125, name: 'Cherry Cola',     nameAr: 'شيري كولا',       descriptionAr: 'شيري كولا',           price: 65,  image: IMG_MOJITO,   category: 'mojito', popular: false },
   { id: 126, name: 'Laguna Mojito',     nameAr: 'موهيتو لاجونا',     descriptionAr: 'موهيتو لاجونا الخاص',   price: 100, image: IMG_MOJITO,   category: 'mojito', popular: true  },
+  { id: 191, name: 'Red Bull Mojito',   nameAr: 'موهيتو ريدبول',    descriptionAr: 'موهيتو ريدبول',         price: 80,  image: IMG_MOJITO,   category: 'mojito', popular: false },
   // ════════════════════════════════════════
   //  ميلك شيك
   // ════════════════════════════════════════
