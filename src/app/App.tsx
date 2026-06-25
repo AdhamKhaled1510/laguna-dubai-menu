@@ -635,7 +635,7 @@ export default function App() {
             <div className="w-px h-8 bg-stone-700" />
             <div className="flex flex-col items-center gap-1">
               <MapPin className="h-4 w-4 text-amber-400/60" />
-              <span>دبي، الإمارات</span>
+              <span>ميت غمر - شارع البحر</span>
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-stone-700/50 text-xs text-stone-600">
