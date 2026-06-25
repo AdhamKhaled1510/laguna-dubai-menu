@@ -144,15 +144,15 @@ const menuData: MenuItemType[] = [
   // ════════════════════════════════════════
   //  اسموزي
   // ════════════════════════════════════════
-  { id: 50, name: 'Kiwi Smoothie',       nameAr: 'اسموزي كيوي',     descriptionAr: 'سموزي كيوي',         price: 55, image: IMG_SMOOTHIE,    category: 'smoothie', popular: false },
-  { id: 51, name: 'Lemon Mint Smoothie', nameAr: 'اسموزي ليمون نعناع',descriptionAr: 'سموزي ليمون ونعناع',price: 60, image: IMG_LEMON,      category: 'smoothie', popular: false },
-  { id: 52, name: 'Lemon Smoothie',      nameAr: 'اسموزي ليمون',    descriptionAr: 'سموزي ليمون',         price: 55, image: IMG_LEMON,      category: 'smoothie', popular: false },
-  { id: 53, name: 'Blueberry Smoothie',  nameAr: 'اسموزي بلو بيري',  descriptionAr: 'سموزي بلو بيري',     price: 60, image: IMG_SMOOTHIE,    category: 'smoothie', popular: false },
-  { id: 54, name: 'Laguna Smoothie',     nameAr: 'اسموزي لاجونا',    descriptionAr: 'سموزي لاجونا مميز',  price: 75, image: IMG_SMOOTHIE,    category: 'smoothie', popular: true  },
-  { id: 55, name: 'Passion Smoothie',    nameAr: 'اسموزي باشن فروت', descriptionAr: 'سموزي باشن فروت',   price: 55, image: IMG_SMOOTHIE,    category: 'smoothie', popular: false },
-  { id: 56, name: 'Watermelon Smoothie', nameAr: 'اسموزي بطيخ',     descriptionAr: 'سموزي بطيخ منعش',    price: 60, image: IMG_SMOOTHIE,    category: 'smoothie', popular: false },
-  { id: 57, name: 'Mix Berry Smoothie',  nameAr: 'اسموزي ميكس بيري', descriptionAr: 'سموزي التوت المشكل',price: 65, image: IMG_SMOOTHIE,    category: 'smoothie', popular: false },
-  { id: 58, name: 'Mango Smoothie',      nameAr: 'اسموزي مانجا',    descriptionAr: 'سموزي مانجا',         price: 60, image: IMG_SMOOTHIE,    category: 'smoothie', popular: false },
+  { id: 50, name: 'Kiwi Smoothie',       nameAr: 'اسموزي كيوي',     descriptionAr: 'سموزي كيوي',         price: 55, image: IMG_SMOOTHIE,    category: 'frappe', popular: false },
+  { id: 51, name: 'Lemon Mint Smoothie', nameAr: 'اسموزي ليمون نعناع',descriptionAr: 'سموزي ليمون ونعناع',price: 60, image: IMG_LEMON,      category: 'frappe', popular: false },
+  { id: 52, name: 'Lemon Smoothie',      nameAr: 'اسموزي ليمون',    descriptionAr: 'سموزي ليمون',         price: 55, image: IMG_LEMON,      category: 'frappe', popular: false },
+  { id: 53, name: 'Blueberry Smoothie',  nameAr: 'اسموزي بلو بيري',  descriptionAr: 'سموزي بلو بيري',     price: 60, image: IMG_SMOOTHIE,    category: 'frappe', popular: false },
+  { id: 54, name: 'Laguna Smoothie',     nameAr: 'اسموزي لاجونا',    descriptionAr: 'سموزي لاجونا مميز',  price: 75, image: IMG_SMOOTHIE,    category: 'frappe', popular: true  },
+  { id: 55, name: 'Passion Smoothie',    nameAr: 'اسموزي باشن فروت', descriptionAr: 'سموزي باشن فروت',   price: 55, image: IMG_SMOOTHIE,    category: 'frappe', popular: false },
+  { id: 56, name: 'Watermelon Smoothie', nameAr: 'اسموزي بطيخ',     descriptionAr: 'سموزي بطيخ منعش',    price: 60, image: IMG_SMOOTHIE,    category: 'frappe', popular: false },
+  { id: 57, name: 'Mix Berry Smoothie',  nameAr: 'اسموزي ميكس بيري', descriptionAr: 'سموزي التوت المشكل',price: 65, image: IMG_SMOOTHIE,    category: 'frappe', popular: false },
+  { id: 58, name: 'Mango Smoothie',      nameAr: 'اسموزي مانجا',    descriptionAr: 'سموزي مانجا',         price: 60, image: IMG_SMOOTHIE,    category: 'frappe', popular: false },
 
   // ════════════════════════════════════════
   //  العصائر الفريش
@@ -288,7 +288,7 @@ function loadCart(): CartItem[] {
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>(loadCart);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('hot');
+  const [activeCategory, setActiveCategory] = useState('all');
   const [headerVisible, setHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
 
@@ -394,11 +394,11 @@ export default function App() {
   };
 
   const categories = [
+    { value: 'all',      label: 'الكل' },
     { value: 'hot',      label: 'ساخن' },
     { value: 'iced',     label: 'بارد' },
     { value: 'matcha',   label: 'ماتشا' },
     { value: 'frappe',   label: 'فرابيه' },
-    { value: 'smoothie', label: 'سموزي' },
     { value: 'milkshake',label: 'ميلك شيك' },
     { value: 'yogurt',   label: 'زبادي' },
     { value: 'juices',   label: 'عصائر' },
@@ -460,7 +460,7 @@ export default function App() {
       {/* Items Grid */}
       <main className="container mx-auto px-4 py-8 pb-32">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredItems(activeCategory).map((item) => (
+          {filteredItems(activeCategory === 'all' ? undefined : activeCategory).map((item) => (
             <MenuItem
               key={item.id}
               item={item}
@@ -471,7 +471,7 @@ export default function App() {
           ))}
         </div>
 
-        {filteredItems(activeCategory).length === 0 && (
+        {filteredItems(activeCategory === 'all' ? undefined : activeCategory).length === 0 && (
           <div className="text-center py-20">
             <p className="text-xl text-stone-400">لا توجد نتائج للبحث</p>
           </div>

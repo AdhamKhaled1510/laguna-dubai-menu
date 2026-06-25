@@ -26,11 +26,11 @@ interface MenuItemProps {
 export function MenuItem({ item, quantity, onAdd, onRemove }: MenuItemProps) {
   return (
     <Card className="overflow-hidden bg-white border-stone-100 hover:border-stone-200 hover:shadow-xl hover:shadow-stone-900/5 transition-all duration-300 text-stone-800 rounded-xl">
-      <div className="relative h-64 overflow-hidden bg-stone-100">
+      <div className="relative aspect-square overflow-hidden bg-stone-100">
         <ImageWithFallback
           src={item.image}
           alt={item.nameAr}
-          className="w-full h-full object-contain p-2 transition-transform duration-500 hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
         />
         {item.popular && (
           <Badge className="absolute top-3 right-3 bg-stone-800 text-white text-xs font-medium shadow-md px-3 py-1 rounded-full">
@@ -39,14 +39,14 @@ export function MenuItem({ item, quantity, onAdd, onRemove }: MenuItemProps) {
         )}
       </div>
       <CardContent className="p-4">
-        <div className="text-right mb-3">
-          <h3 className="text-base font-bold mb-1 text-stone-800">{item.nameAr}</h3>
-          <p className="text-xs text-stone-400 mb-2 leading-relaxed">
+        <div className="mb-3">
+          <div className="flex justify-between items-start gap-2">
+            <h3 className="text-base font-bold text-stone-800">{item.nameAr}</h3>
+            <span className="text-sm font-bold text-stone-800 bg-[#0A2242] text-white px-2.5 py-0.5 shrink-0">{item.price}</span>
+          </div>
+          <p className="text-xs text-stone-400 leading-relaxed line-clamp-2 text-right mt-1">
             {item.descriptionAr}
           </p>
-          <div className="text-lg font-bold text-stone-800">
-            {item.price} <span className="text-xs font-normal text-stone-400">ج.م</span>
-          </div>
         </div>
 
         {quantity === 0 ? (
