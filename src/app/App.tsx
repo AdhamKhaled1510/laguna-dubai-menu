@@ -499,86 +499,103 @@ export default function App() {
           headerVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
-        <div className="container mx-auto px-4 md:px-6 py-4 flex flex-col gap-3">
-          {/* Top row: Search (right) · Logo+Name (left) */}
-          <div className="flex items-center justify-between gap-3">
-            {/* Search — on the right in RTL */}
-            <div className="relative flex-1 max-w-xs" ref={searchRef}>
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="w-full flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-4 py-2.5 transition-colors"
-              >
-                <Search className="h-4 w-4 text-white/40" />
-                <span className="text-sm text-white/40">ابحث في القائمة...</span>
-              </button>
+        <div className="container mx-auto px-4 md:px-6 py-5 md:py-6 flex items-center justify-between gap-4">
+          {/* Logo+Name */}
+          <div className="flex items-center gap-3">
+            <img src={logoUrl} alt="Laguna Dubai" className="h-14 md:h-20 w-auto brightness-0 invert" />
+            <div className="text-right">
+              <h1 className="text-xl md:text-2xl font-bold tracking-wide text-white leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>LAGUNA DUBAI</h1>
+              <p className="text-[10px] md:text-xs text-white/40 tracking-[0.2em]">CAFÉ &bull; RESTAURANT</p>
+            </div>
+          </div>
 
-              {searchOpen && (
-                <>
-                  <div className="fixed inset-0 z-30" onClick={() => setSearchOpen(false)} />
-                  <div className="absolute left-0 right-0 top-12 z-40 bg-white rounded-2xl shadow-2xl border border-stone-100 p-3" style={{animation: 'fadeIn 0.15s ease-out'}}>
-                    <div className="relative">
-                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-300" />
-                      <Input
-                        type="text"
-                        placeholder="ابحث في القائمة..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        autoFocus
-                        className="pr-9 text-right h-10 text-sm bg-stone-50 border-stone-200 text-stone-800 placeholder:text-stone-400 focus:border-amber-400/60 focus:ring-amber-400/20 rounded-xl"
-                      />
-                      {searchQuery && (
-                        <button
-                          onClick={() => { setSearchQuery(''); setSearchOpen(false); }}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-stone-200 hover:bg-stone-300 text-stone-500 text-xs transition-colors"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
+          {/* Search */}
+          <div className="relative w-full max-w-[200px] md:max-w-xs" ref={searchRef}>
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="w-full flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-4 py-2.5 transition-colors"
+            >
+              <Search className="h-4 w-4 text-white/40 shrink-0" />
+              <span className="text-sm text-white/40 truncate">ابحث في القائمة...</span>
+            </button>
+
+            {searchOpen && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setSearchOpen(false)} />
+                <div className="absolute left-0 right-0 top-12 z-40 bg-white rounded-2xl shadow-2xl border border-stone-100 p-3" style={{animation: 'fadeIn 0.15s ease-out'}}>
+                  <div className="relative">
+                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-300" />
+                    <Input
+                      type="text"
+                      placeholder="ابحث في القائمة..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      autoFocus
+                      className="pr-9 text-right h-10 text-sm bg-stone-50 border-stone-200 text-stone-800 placeholder:text-stone-400 focus:border-amber-400/60 focus:ring-amber-400/20 rounded-xl"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => { setSearchQuery(''); setSearchOpen(false); }}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-stone-200 hover:bg-stone-300 text-stone-500 text-xs transition-colors"
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
-                </>
-              )}
-            </div>
-
-            {/* Logo+Name — on the left in RTL */}
-            <div className="flex items-center gap-2.5 shrink-0">
-              <div className="text-right">
-                <h1 className="text-sm md:text-base font-bold tracking-wide text-white leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>LAGUNA DUBAI</h1>
-                <p className="text-[8px] md:text-[9px] text-white/40 tracking-[0.15em]">CAFÉ &bull; RESTAURANT</p>
-              </div>
-              <img src={logoUrl} alt="Laguna Dubai" className="h-9 md:h-10 w-auto brightness-0 invert" />
-            </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </header>
 
-      {/* Category Navigation */}
-      <div className={`sticky z-30 bg-white border-b border-stone-100 shadow-sm ${headerVisible ? 'top-[68px] md:top-[76px]' : 'top-0'}`}>
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex gap-0 overflow-x-auto scrollbar-hide -mb-px">
+      {/* Main Content with sidebar */}
+      <main className="container mx-auto px-4 md:px-6 py-6 md:py-8 pb-32 relative">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-amber-200/20 rounded-full blur-3xl animate-pulse" style={{animationDuration: '8s'}} />
+          <div className="absolute -bottom-32 -left-20 w-80 h-80 bg-stone-300/20 rounded-full blur-3xl animate-pulse" style={{animationDuration: '12s'}} />
+          <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-amber-100/15 rounded-full blur-3xl animate-pulse" style={{animationDuration: '10s'}} />
+        </div>
+
+        <div className="flex gap-6 md:gap-8">
+          {/* Categories Sidebar (left) */}
+          <aside className="hidden md:flex flex-col gap-1 shrink-0 sticky top-24 self-start">
             {categories.map((cat) => (
               <button
                 key={cat.value}
                 onClick={() => handleCategoryChange(cat.value)}
-                className={`relative whitespace-nowrap px-5 py-3 text-sm font-medium transition-colors ${
+                className={`text-right whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                   activeCategory === cat.value
-                    ? 'text-stone-900'
-                    : 'text-stone-400 hover:text-stone-600'
+                    ? 'bg-stone-800 text-white shadow-md shadow-stone-800/20'
+                    : 'text-stone-500 hover:text-stone-700 hover:bg-white/60'
                 }`}
               >
                 {cat.label}
-                {activeCategory === cat.value && (
-                  <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-stone-800 rounded-full" />
-                )}
+              </button>
+            ))}
+          </aside>
+
+          {/* Mobile Categories (horizontal scroll) */}
+          <div className="flex md:hidden gap-2 overflow-x-auto scrollbar-hide pb-3 -mx-4 px-4">
+            {categories.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => handleCategoryChange(cat.value)}
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all shrink-0 ${
+                  activeCategory === cat.value
+                    ? 'bg-stone-800 text-white shadow-md'
+                    : 'bg-white/70 text-stone-500 border border-stone-200/50'
+                }`}
+              >
+                {cat.label}
               </button>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* Items Grid */}
-      <main className="container mx-auto px-4 md:px-6 py-6 md:py-8 pb-32">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
+          {/* Items Grid */}
+          <div className="flex-1 min-w-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
           {filteredItems(activeCategory).map((item, idx) => (
             <MenuItem
               key={item.id}
@@ -596,6 +613,8 @@ export default function App() {
             <p className="text-xl text-stone-400">لا توجد نتائج للبحث</p>
           </div>
         )}
+          </div>
+        </div>
       </main>
 
       {/* Footer */}
