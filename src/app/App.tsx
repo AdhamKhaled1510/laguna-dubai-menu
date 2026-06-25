@@ -288,7 +288,7 @@ function loadCart(): CartItem[] {
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>(loadCart);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState('hot');
   const [headerVisible, setHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
 
@@ -394,7 +394,6 @@ export default function App() {
   };
 
   const categories = [
-    { value: 'all',      label: 'الكل' },
     { value: 'hot',      label: 'ساخن' },
     { value: 'iced',     label: 'بارد' },
     { value: 'matcha',   label: 'ماتشا' },
@@ -460,7 +459,7 @@ export default function App() {
       {/* Items Grid */}
       <main className="container mx-auto px-4 py-8 pb-32">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredItems(activeCategory === 'all' ? undefined : activeCategory).map((item) => (
+          {filteredItems(activeCategory).map((item) => (
             <MenuItem
               key={item.id}
               item={item}
@@ -471,7 +470,7 @@ export default function App() {
           ))}
         </div>
 
-        {filteredItems(activeCategory === 'all' ? undefined : activeCategory).length === 0 && (
+        {filteredItems(activeCategory).length === 0 && (
           <div className="text-center py-20">
             <p className="text-xl text-stone-400">لا توجد نتائج للبحث</p>
           </div>
