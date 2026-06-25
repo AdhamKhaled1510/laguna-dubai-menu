@@ -448,18 +448,30 @@ export default function App() {
           <p className="text-[10px] md:text-xs text-white/50 tracking-[0.3em] mt-1">CAFÉ &bull; RESTAURANT</p>
 
           {/* Table Number */}
-          <div className="flex items-center gap-2 mt-2">
-            <label className="text-xs text-white/60">ترابيزة</label>
-            <select
-              value={tableNumber}
-              onChange={(e) => setTableNumber(Number(e.target.value))}
-              className="appearance-none bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 pr-8 focus:outline-none focus:border-amber-400/40 cursor-pointer"
-              style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff80' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundPosition: 'left 8px center', backgroundRepeat: 'no-repeat', backgroundSize: '16px', paddingRight: '12px', paddingLeft: '28px' }}
-            >
-              {Array.from({ length: 20 }, (_, i) => i + 1).map(n => (
-                <option key={n} value={n} className="text-stone-900">{n}</option>
+          <div className="flex flex-col items-center mt-2">
+            <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-3 py-1.5">
+              <span className="text-[10px] text-white/50 tracking-wider">TABLE</span>
+              <span className="text-lg font-bold text-amber-400 mx-1 tabular-nums">{tableNumber.toString().padStart(2, '0')}</span>
+              <div className="flex gap-0.5">
+                <button onClick={() => setTableNumber(Math.max(1, tableNumber - 1))} className="w-6 h-6 flex items-center justify-center rounded-md bg-white/10 hover:bg-white/20 text-white text-xs transition-colors">−</button>
+                <button onClick={() => setTableNumber(Math.min(20, tableNumber + 1))} className="w-6 h-6 flex items-center justify-center rounded-md bg-white/10 hover:bg-white/20 text-white text-xs transition-colors">+</button>
+              </div>
+            </div>
+            <div className="flex gap-1.5 mt-1.5">
+              {[1,2,3,4,5,6,7,8,9,10,15,20].map(n => (
+                <button
+                  key={n}
+                  onClick={() => setTableNumber(n)}
+                  className={`w-7 h-6 text-[10px] font-bold rounded-md transition-colors ${
+                    tableNumber === n
+                      ? 'bg-amber-500 text-stone-900'
+                      : 'bg-white/10 text-white/60 hover:bg-white/20'
+                  }`}
+                >
+                  {n}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
 
           <div className="w-full max-w-md mx-auto mt-3 md:mt-4 relative">
