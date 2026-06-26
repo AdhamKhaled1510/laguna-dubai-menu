@@ -557,6 +557,23 @@ export default function App() {
           <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-amber-100/15 rounded-full blur-3xl animate-pulse" style={{animationDuration: '10s'}} />
         </div>
 
+        {/* Mobile Categories (horizontal scroll) */}
+        <div className="flex md:hidden gap-2 overflow-x-auto scrollbar-hide pb-3 -mx-4 px-4 mb-4">
+          {categories.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => handleCategoryChange(cat.value)}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all shrink-0 ${
+                activeCategory === cat.value
+                  ? 'bg-stone-800 text-white shadow-md'
+                  : 'bg-white/70 text-stone-500 border border-stone-200/50'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
         <div className="flex gap-6 lg:gap-10">
           {/* Categories Sidebar (iPad+) */}
           <aside className="hidden md:flex flex-col gap-1 shrink-0 sticky top-28 self-start w-28 lg:w-32">
@@ -574,23 +591,6 @@ export default function App() {
               </button>
             ))}
           </aside>
-
-          {/* Mobile Categories (horizontal scroll) */}
-          <div className="flex md:hidden gap-2 overflow-x-auto scrollbar-hide pb-3 -mx-4 px-4">
-            {categories.map((cat) => (
-              <button
-                key={cat.value}
-                onClick={() => handleCategoryChange(cat.value)}
-                className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all shrink-0 ${
-                  activeCategory === cat.value
-                    ? 'bg-stone-800 text-white shadow-md'
-                    : 'bg-white/70 text-stone-500 border border-stone-200/50'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
 
           {/* Items Grid */}
           <div className="flex-1 min-w-0">
