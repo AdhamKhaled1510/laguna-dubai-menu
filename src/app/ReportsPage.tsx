@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { getOrders, Order } from './lib/orders';
-import { ArrowLeft, BarChart3, Coffee, DollarSign, ShoppingBag, TrendingUp } from 'lucide-react';
+import { getOrders, clearAllOrders, Order } from './lib/orders';
+import { ArrowLeft, BarChart3, Coffee, DollarSign, ShoppingBag, TrendingUp, Trash2 } from 'lucide-react';
 import logoUrl from '@/assets/logo.png';
 
 interface DrinkSummary {
@@ -13,6 +13,19 @@ interface DrinkSummary {
 export default function ReportsPage() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [clearing, setClearing] = useState(false);
+
+  const handleClear = async () => {
+    if (!window.confirm('هل أنت متأكد من مسح جميع بيانات الطلبات؟ هذا الإجراء لا يمكن التراجع عنه.')) return;
+    setClearing(true);
+    try {
+      await clearAllOrders();
+      setOrders([]);
+    } catch {
+      alert('حدث خطأ أثناء المسح');
+    }
+    setClearing(false);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,7 +69,14 @@ export default function ReportsPage() {
             <BarChart3 className="h-5 w-5 text-amber-600" />
             <h1 className="text-xl font-bold text-stone-800">تقارير اليوم</h1>
           </div>
-          <div className="w-20" />
+          <button
+            onClick={handleClear}
+            disabled={clearing}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            {clearing ? 'جاري المسح...' : 'مسح الكل'}
+          </button>
         </div>
 
         {/* Stats Cards */}

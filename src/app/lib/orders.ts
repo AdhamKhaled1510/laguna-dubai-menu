@@ -91,3 +91,7 @@ export async function getNotifications(): Promise<Notification[]> {
 export async function clearNotification(id: string): Promise<void> {
   await notifApiId(id, 'DELETE');
 }
+
+export async function clearAllOrders(): Promise<void> {
+  await api('DELETE');
+}
