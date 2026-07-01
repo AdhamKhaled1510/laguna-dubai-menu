@@ -176,6 +176,31 @@ export default function EmployeesPage() {
                         : '—'}
                     </span>
                   </div>
+                  {/* Per-employee attendance history */}
+                  <details className="border-t border-stone-50">
+                    <summary className="px-4 py-2 text-xs text-stone-400 cursor-pointer hover:text-stone-600 hover:bg-stone-50 transition-colors">
+                      أيام الحضور ({attendance.filter(a => a.employeeId === emp.id).length})
+                    </summary>
+                    <div className="px-4 pb-3 pt-1 max-h-48 overflow-y-auto space-y-1">
+                      {attendance
+                        .filter(a => a.employeeId === emp.id)
+                        .sort((a, b) => b.date.localeCompare(a.date))
+                        .map(a => (
+                          <div key={a.id} className="flex items-center justify-between text-xs py-1.5 border-b border-stone-50 last:border-0">
+                            <span className="text-stone-600">{a.date}</span>
+                            <span className="text-stone-400" dir="auto">
+                              {new Date(a.checkIn).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
+                              {a.checkOut ? ` → ${new Date(a.checkOut).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}` : ' (جاري)'}
+                              <span className="mr-2 text-stone-300">
+                                {a.checkOut
+                                  ? `${Math.round((a.checkOut - a.checkIn) / 3600000)}س`
+                                  : `${Math.round((Date.now() - a.checkIn) / 3600000)}س`}
+                              </span>
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  </details>
                 </div>
               );
             })
