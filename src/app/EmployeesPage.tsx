@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, Users, Plus, X, Trash2, Clock, CheckCircle, UserPlus, DollarSign } from 'lucide-react';
-import { getEmployees, saveEmployee, updateEmployee, deleteEmployee, getAttendance, saveAttendance, updateAttendance, Employee, AttendanceRecord } from './lib/orders';
+import { getEmployees, saveEmployee, updateEmployee, deleteEmployee, getAttendance, saveAttendance, updateAttendance, clearAllAttendance, clearAllEmployees, Employee, AttendanceRecord } from './lib/orders';
 
 export default function EmployeesPage() {
   const navigate = useNavigate();
@@ -87,10 +87,25 @@ export default function EmployeesPage() {
             <Users className="h-5 w-5 text-amber-600" />
             <h1 className="text-xl font-bold text-stone-800">الموظفين والحضور</h1>
           </div>
-          <button onClick={() => setShowAdd(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg transition-colors">
-            <Plus className="h-3.5 w-3.5" />
-            إضافة موظف
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowAdd(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg transition-colors">
+              <Plus className="h-3.5 w-3.5" />
+              إضافة موظف
+            </button>
+            <button
+              onClick={async () => {
+                if (!window.confirm('⚠️ مسح سجل الحضور بالكامل؟')) return;
+                if (!window.confirm('تأكيد: سيتم حذف جميع أيام الحضور نهائياً!')) return;
+                await clearAllAttendance();
+                setAttendance([]);
+                alert('✅ تم مسح سجل الحضور');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-500 border border-red-200 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              مسح سجل الحضور
+            </button>
+          </div>
         </div>
 
         {/* Summary Cards */}

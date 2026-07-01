@@ -350,6 +350,14 @@ export async function updateAttendance(id: string, data: Partial<AttendanceRecor
   });
 }
 
+export async function clearAllAttendance(): Promise<void> {
+  await fetch(`${ATTEND_URL}.json`, { method: 'DELETE' });
+}
+
+export async function clearAllEmployees(): Promise<void> {
+  await fetch(`${EMP_URL}.json`, { method: 'DELETE' });
+}
+
 // ── Table Locks ──────────────────────────────────────────
 export async function lockTable(table: number, sessionId: string): Promise<void> {
   await fetch(`${LOCKS_URL}/${table}.json`, {
