@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router';
 import { Search, Phone, MessageCircle, MapPin } from 'lucide-react';
 import { MenuItem, MenuItemType } from './components/MenuItem';
 import { CartSheet } from './components/CartSheet';
@@ -286,8 +287,9 @@ function loadCart(): CartItem[] {
 }
 
 export default function App() {
+  const [searchParams] = useSearchParams();
   const [cart, setCart] = useState<CartItem[]>(loadCart);
-  const [tableNumber, setTableNumber] = useState(1);
+  const [tableNumber, setTableNumber] = useState(Number(searchParams.get('table')) || 1);
   const [tablePopupOpen, setTablePopupOpen] = useState(false);
   const [completedOpen, setCompletedOpen] = useState(false);
   const [completedOrders, setCompletedOrders] = useState<Order[]>([]);

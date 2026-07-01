@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Receipt, Search, Undo2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { ArrowLeft, Receipt, Search, Undo2, CheckCircle, XCircle, Clock, Printer } from 'lucide-react';
 import { getInvoices, updateInvoiceStatus, Invoice } from './lib/orders';
 import logoUrl from '@/assets/logo.png';
 
@@ -23,6 +23,90 @@ export default function InvoicesPage() {
     const reason = prompt('السبب (اختياري):');
     await updateInvoiceStatus(inv.id, 'returned', inv.items.map(i => ({ nameAr: i.nameAr, quantity: i.quantity })));
     setInvoices(prev => prev.map(i => i.id === inv.id ? { ...i, status: 'returned', returnedItems: inv.items.map(item => ({ nameAr: item.nameAr, quantity: item.quantity })) } : i));
+  };
+
+  const handlePrint = (inv: Invoice) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html dir="rtl">
+      <head>
+        <meta charset="utf-8">
+        <title>فاتورة ${inv.invoiceNumber}</title>
+        <style>
+          @page { margin: 15mm; }
+          body { font-family: 'Arial', sans-serif; margin: 0; padding: 20px; color: #1a1a1a; background: #fff; }
+          .invoice { max-width: 300px; margin: 0 auto; }
+          .header { text-align: center; border-bottom: 2px solid #1a1a1a; padding-bottom: 15px; margin-bottom: 15px; }
+          .header h1 { font-size: 20px; margin: 0 0 5px; letter-spacing: 2px; }
+          .header p { font-size: 11px; color: #666; margin: 2px 0; }
+          .header .inv-no { font-size: 13px; font-weight: bold; margin-top: 8px; }
+          .info { font-size: 12px; margin-bottom: 15px; }
+          .info span { display: block; margin: 3px 0; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+          th { background: #f5f0eb; font-size: 11px; padding: 8px 5px; text-align: center; font-weight: bold; }
+          td { padding: 6px 5px; text-align: center; font-size: 12px; border-bottom: 1px solid #eee; }
+          td:first-child, th:first-child { text-align: right; }
+          td:last-child, th:last-child { text-align: left; }
+          .total { text-align: left; font-size: 14px; font-weight: bold; border-top: 2px solid #1a1a1a; padding-top: 10px; margin-bottom: 20px; }
+          .footer { text-align: center; font-size: 10px; color: #999; border-top: 1px dashed #ddd; padding-top: 15px; }
+          .footer img { height: 25px; margin-bottom: 5px; opacity: 0.4; }
+          @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+        </style>
+      </head>
+      <body>
+        <div class="invoice">
+          <div class="header">
+            <h1>LAGUNA DUBAI</h1>
+            <p>ميت غمر - شارع البحر</p>
+            <p>+20 123 456 7890</p>
+            <div class="inv-no">فاتورة ${inv.invoiceNumber}</div>
+          </div>
+          <div class="info">
+            <span>التاريخ: ${new Date(inv.createdAt).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+            <span>ترابيزة رقم: ${inv.tableNumber}</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>الصنف</th>
+                <th>الكمية</th>
+                <th>السعر</th>
+                <th>الإجمالي</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${inv.items.map(item => `
+                <tr>
+                  <td>${item.nameAr}</td>
+                  <td>${item.quantity}</td>
+                  <td>${item.price}</td>
+                  <td>${item.price * item.quantity}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="total">
+            الإجمالي: ${inv.totalPrice} ج.م
+          </div>
+          ${inv.returnedItems && inv.returnedItems.length > 0 ? `
+            <div style="font-size:11px;color:#ef4444;margin-bottom:10px;text-align:center;">
+              مرتجع: ${inv.returnedItems.map(r => `${r.nameAr} (${r.quantity})`).join(' • ')}
+            </div>
+          ` : ''}
+          <div class="footer">
+            <p>شكراً لزيارتكم - نتمنى لكم يوماً سعيداً</p>
+            <p style="margin-top:3px;">LAGUNA DUBAI &bull; CAFÉ &bull; RESTAURANT</p>
+          </div>
+        </div>
+        <script>
+          window.onload = function() { window.print(); window.close(); };
+        <\\/script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const handlePartialReturn = async (inv: Invoice) => {
@@ -163,6 +247,13 @@ export default function InvoicesPage() {
                 <div className="px-4 py-3 bg-stone-50 flex items-center justify-between">
                   <span className="text-sm font-bold text-stone-800">الإجمالي: {inv.totalPrice} ج.م</span>
                   <div className="flex gap-2">
+                    <button
+                      onClick={() => handlePrint(inv)}
+                      className="px-3 py-1.5 text-xs font-medium text-stone-600 bg-white hover:bg-stone-100 rounded-lg transition-colors border border-stone-200"
+                    >
+                      <Printer className="h-3 w-3 inline ml-1" />
+                      طباعة
+                    </button>
                     {inv.status === 'paid' && (
                       <>
                         <button
