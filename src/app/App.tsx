@@ -290,14 +290,14 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     const acquire = async () => {
-      const existing = await getTableLock(tableNumber);
-      if (existing && existing.sessionId !== sessionId) {
-        setLockBlocked(true);
-        return;
-      }
       await lockTable(tableNumber, sessionId);
       if (cancelled) return;
-      setLockBlocked(false);
+      const current = await getTableLock(tableNumber);
+      if (current && current.sessionId !== sessionId) {
+        setLockBlocked(true);
+      } else {
+        setLockBlocked(false);
+      }
     };
     acquire();
     const interval = setInterval(acquire, 15000);
@@ -307,6 +307,13 @@ export default function App() {
       unlockTable(tableNumber);
     };
   }, [tableNumber, sessionId]);
+
+  useEffect(() => {
+    if (lockBlocked) {
+      setCart([]);
+      saveCart([]);
+    }
+  }, [lockBlocked]);
 
   useEffect(() => {
     const handleScroll = () => {
