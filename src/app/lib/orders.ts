@@ -19,6 +19,7 @@ const REPORTS_URL = 'https://laguna-dubai-default-rtdb.europe-west1.firebasedata
 const PASS_URL = 'https://laguna-dubai-default-rtdb.europe-west1.firebasedatabase.app/access/passwords';
 const INVOICES_URL = 'https://laguna-dubai-default-rtdb.europe-west1.firebasedatabase.app/invoices';
 const COUNTER_URL = 'https://laguna-dubai-default-rtdb.europe-west1.firebasedatabase.app/counters';
+const LOCKS_URL = 'https://laguna-dubai-default-rtdb.europe-west1.firebasedatabase.app/tableLocks';
 
 export interface DrinkSummary {
   nameAr: string;
@@ -270,4 +271,26 @@ export async function updateInvoiceStatus(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
+}
+
+// ── Table Locks ──────────────────────────────────────────
+export async function lockTable(table: number, sessionId: string): Promise<void> {
+  await fetch(`${LOCKS_URL}/${table}.json`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionId, at: Date.now() }),
+  });
+}
+
+export async function unlockTable(table: number): Promise<void> {
+  await fetch(`${LOCKS_URL}/${table}.json`, { method: 'DELETE' });
+}
+
+export async function getTableLock(table: number): Promise<{ sessionId: string; at: number } | null> {
+  const res = await fetch(`${LOCKS_URL}/${table}.json`);
+  const data = await res.json();
+  if (!data || !data.sessionId) return null;
+  // Expire locks older than 40 seconds
+  if (Date.now() - data.at > 40000) return null;
+  return data;
 }

@@ -7,7 +7,7 @@ import { Input } from './components/ui/input';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
 import logoUrl from '@/assets/logo.png';
-import { saveOrder, getNotifications, clearNotification, getOrders, Order } from './lib/orders';
+import { saveOrder, getNotifications, clearNotification, getOrders, Order, lockTable, unlockTable, getTableLock } from './lib/orders';
 
 // ── Local menu images (from src/assets/menu/) ─────────────
 const _menuFiles = import.meta.glob('@/assets/menu/*.{jpg,png,webp}', {
@@ -283,6 +283,31 @@ export default function App() {
   const tableRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
+  // ── Table lock ──────────────────────────────────────────
+  const [lockBlocked, setLockBlocked] = useState(false);
+  const sessionId = useRef(`${Date.now()}-${Math.random().toString(36).slice(2)}`).current;
+
+  useEffect(() => {
+    let cancelled = false;
+    const acquire = async () => {
+      const existing = await getTableLock(tableNumber);
+      if (existing && existing.sessionId !== sessionId) {
+        setLockBlocked(true);
+        return;
+      }
+      await lockTable(tableNumber, sessionId);
+      if (cancelled) return;
+      setLockBlocked(false);
+    };
+    acquire();
+    const interval = setInterval(acquire, 15000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      unlockTable(tableNumber);
+    };
+  }, [tableNumber, sessionId]);
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -488,6 +513,23 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f5f0eb] text-stone-800" dir="rtl">
+      {lockBlocked && (
+        <div className="fixed inset-0 z-[100] bg-stone-900/95 flex flex-col items-center justify-center p-6" style={{animation: 'fadeIn 0.2s ease-out'}}>
+          <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mb-6">
+            <svg className="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">هذه الترابيزة قيد الاستخدام</h2>
+          <p className="text-white/60 text-center text-sm max-w-xs">يوجد طلب قيد الإنشاء حالياً على هذه الترابيزة، برجاء الانتظار أو اختيار ترابيزة أخرى</p>
+          <button
+            onClick={() => window.location.href = window.location.pathname.replace(/\/waiter.*/, '/') + '#/'}
+            className="mt-8 px-6 py-3 bg-amber-500 text-stone-900 font-bold rounded-xl hover:bg-amber-400 transition-colors"
+          >
+            العودة للقائمة الرئيسية
+          </button>
+        </div>
+      )}
       <Toaster position="top-center" richColors />
 
       {/* Header */}
