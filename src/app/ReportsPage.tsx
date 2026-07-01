@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { getOrders, clearAllOrders, saveDailyReport, getDailyReports, getInvoices, DailyReport, Order, Invoice } from './lib/orders';
+import { getOrders, clearAllOrders, clearOrdersByDate, saveDailyReport, getDailyReports, getInvoices, DailyReport, Order, Invoice } from './lib/orders';
 import { ArrowLeft, BarChart3, Coffee, DollarSign, ShoppingBag, TrendingUp, Trash2, Calendar, ChevronDown, LayoutDashboard } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import logoUrl from '@/assets/logo.png';
@@ -285,11 +285,20 @@ export default function ReportsPage() {
             )}
             <button
               onClick={async () => {
-                if (!window.confirm('⚠️ مسح جميع الطلبات؟\nهذا لا يؤثر على التقارير المؤرشفة.')) return;
+                const isDayView = viewMode === 'day' && selectedDay;
+                const label = isDayView ? `طلبات يوم ${selectedDay}` : 'جميع الطلبات';
+                if (!window.confirm(`⚠️ مسح ${label}؟\nهذا لا يؤثر على التقارير المؤرشفة.`)) return;
                 try {
-                  await clearAllOrders();
-                  setOrders([]);
-                  alert('✅ تم مسح جميع الطلبات بنجاح');
+                  if (isDayView) {
+                    await clearOrdersByDate(selectedDay);
+                  } else {
+                    await clearAllOrders();
+                  }
+                  setOrders(prev => isDayView ? prev.filter(o => {
+                    const d = new Date(o.timestamp).toISOString().slice(0, 10);
+                    return d !== selectedDay;
+                  }) : []);
+                  alert(`✅ تم مسح ${label}`);
                 } catch {
                   alert('❌ فشل المسح، حاول مرة أخرى');
                 }
@@ -297,7 +306,7 @@ export default function ReportsPage() {
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
               <Trash2 className="h-3.5 w-3.5" />
-              مسح الطلبات
+              مسح {viewMode === 'day' && selectedDay ? 'هذا اليوم' : 'الطلبات'}
             </button>
           </div>
         </div>
@@ -565,115 +574,132 @@ export default function ReportsPage() {
                 <button
                   key={p}
                   onClick={() => setDashboardPeriod(p)}
-                  className={`shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                    dashboardPeriod === p ? 'bg-amber-100 text-amber-800' : 'bg-white text-stone-500 hover:bg-stone-50 border border-stone-200'
+                  className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
+                    dashboardPeriod === p
+                      ? 'bg-gradient-to-l from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/30 scale-105'
+                      : 'bg-white text-stone-500 hover:text-stone-700 hover:shadow-md border border-stone-200'
                   }`}
                 >
-                  {p === 'day' ? 'يوم' : p === 'week' ? 'أسبوع' : 'شهر'}
+                  {p === 'day' ? '📅 يوم' : p === 'week' ? '📊 أسبوع' : '📈 شهر'}
                 </button>
               ))}
             </div>
 
             {/* Summary cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
-                <p className="text-xs text-stone-400 mb-1">إجمالي الإيرادات ({periodLabel})</p>
-                <p className="text-xl font-bold text-amber-600">{dashTotalRevenue.toLocaleString('ar-EG')} ج.م</p>
-              </div>
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
-                <p className="text-xs text-stone-400 mb-1">المرتجعات</p>
-                <p className="text-xl font-bold text-red-500">{dashTotalReturns.toLocaleString('ar-EG')} ج.م</p>
-              </div>
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
-                <p className="text-xs text-stone-400 mb-1">صافي الربح</p>
-                <p className="text-xl font-bold text-emerald-600">{dashNetRevenue.toLocaleString('ar-EG')} ج.م</p>
-              </div>
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-stone-100">
-                <p className="text-xs text-stone-400 mb-1">إجمالي الطلبات</p>
-                <p className="text-xl font-bold text-stone-800">{dashTotalOrders}</p>
-              </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+              {[
+                { label: 'إجمالي الإيرادات', value: `${dashTotalRevenue.toLocaleString('ar-EG')} ج.م`, color: 'text-amber-600', bg: 'from-amber-50 to-amber-100', icon: '💰' },
+                { label: 'المرتجعات', value: `${dashTotalReturns.toLocaleString('ar-EG')} ج.م`, color: 'text-red-500', bg: 'from-red-50 to-red-100', icon: '↩️' },
+                { label: 'صافي الربح', value: `${dashNetRevenue.toLocaleString('ar-EG')} ج.م`, color: 'text-emerald-600', bg: 'from-emerald-50 to-emerald-100', icon: '✅' },
+                { label: 'إجمالي الطلبات', value: dashTotalOrders, color: 'text-stone-800', bg: 'from-stone-50 to-stone-100', icon: '📋' },
+              ].map((card, idx) => (
+                <div key={idx} className={`bg-gradient-to-br ${card.bg} rounded-2xl p-4 shadow-sm border border-white/60 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-stone-400 font-medium">{card.label}</span>
+                    <span className="text-lg">{card.icon}</span>
+                  </div>
+                  <p className={`text-xl font-bold ${card.color} leading-tight`}>{card.value}</p>
+                  <p className="text-[10px] text-stone-300 mt-1">{periodLabel}</p>
+                </div>
+              ))}
             </div>
 
             {/* Combined chart: Revenue + Returns + Orders */}
-            <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-5 mb-6">
+            <div className="bg-white rounded-2xl shadow-md border border-stone-100 p-5 mb-6">
               <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="h-4 w-4 text-amber-600" />
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm">
+                  <TrendingUp className="h-4 w-4 text-white" />
+                </div>
                 <h2 className="text-sm font-bold text-stone-800">الإيرادات والطلبات والمرتجعات ({periodLabel})</h2>
               </div>
               {dashData.some(d => d.revenue > 0 || d.orders > 0) ? (
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={dashData}>
-                    <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#999' }} axisLine={false} tickLine={false} interval={dashboardPeriod === 'day' ? 2 : 'preserveStartEnd'} />
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={dashData} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+                    <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#999' }} axisLine={{ stroke: '#eee' }} tickLine={false} interval={dashboardPeriod === 'day' ? 2 : 'preserveStartEnd'} />
                     <YAxis yAxisId="left" tick={{ fontSize: 10, fill: '#999' }} axisLine={false} tickLine={false} />
                     <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: '#999' }} axisLine={false} tickLine={false} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar yAxisId="left" dataKey="revenue" name="الإيرادات" radius={[4, 4, 0, 0]} fill="#f59e0b" />
-                    <Bar yAxisId="left" dataKey="returns" name="المرتجعات" radius={[4, 4, 0, 0]} fill="#ef4444" />
-                    <Bar yAxisId="right" dataKey="orders" name="الطلبات" radius={[4, 4, 0, 0]} fill="#3b82f6" opacity={0.6} />
+                    <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f5f0eb' }} />
+                    <Bar yAxisId="left" dataKey="revenue" name="الإيرادات" radius={[4, 4, 0, 0]} fill="#f59e0b" maxBarSize={32} />
+                    <Bar yAxisId="left" dataKey="returns" name="المرتجعات" radius={[4, 4, 0, 0]} fill="#ef4444" maxBarSize={32} />
+                    <Bar yAxisId="right" dataKey="orders" name="الطلبات" radius={[4, 4, 0, 0]} fill="#3b82f6" opacity={0.5} maxBarSize={32} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-center text-sm text-stone-400 py-8">لا توجد بيانات كافية</p>
+                <div className="text-center py-10">
+                  <TrendingUp className="h-10 w-10 text-stone-200 mx-auto mb-2" />
+                  <p className="text-sm text-stone-400">لا توجد بيانات كافية</p>
+                </div>
               )}
             </div>
 
             {/* Top drinks + Orders pie */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-              <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-5">
+              <div className="bg-white rounded-2xl shadow-md border border-stone-100 p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <Coffee className="h-4 w-4 text-amber-600" />
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm">
+                    <Coffee className="h-4 w-4 text-white" />
+                  </div>
                   <h2 className="text-sm font-bold text-stone-800">أعلى المشروبات إيراداً</h2>
                 </div>
                 {topDrinks.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={topDrinks} layout="vertical">
-                      <XAxis type="number" tick={{ fontSize: 10, fill: '#999' }} axisLine={false} tickLine={false} />
-                      <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#666' }} axisLine={false} tickLine={false} width={90} />
-                      <Tooltip />
-                      <Bar dataKey="revenue" name="الإيرادات" radius={[0, 6, 6, 0]} fill="#10b981" />
+                  <ResponsiveContainer width="100%" height={260}>
+                    <BarChart data={topDrinks} layout="vertical" margin={{ left: 0, right: 10 }}>
+                      <XAxis type="number" tick={{ fontSize: 10, fill: '#999' }} axisLine={{ stroke: '#eee' }} tickLine={false} />
+                      <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#666' }} axisLine={false} tickLine={false} width={85} />
+                      <Tooltip cursor={{ fill: '#f5f0eb' }} />
+                      <Bar dataKey="revenue" name="الإيرادات" radius={[0, 6, 6, 0]} fill="#10b981" maxBarSize={20} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <p className="text-center text-sm text-stone-400 py-8">لا توجد بيانات</p>
+                  <div className="text-center py-10">
+                    <Coffee className="h-10 w-10 text-stone-200 mx-auto mb-2" />
+                    <p className="text-sm text-stone-400">لا توجد بيانات</p>
+                  </div>
                 )}
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-5">
+              <div className="bg-white rounded-2xl shadow-md border border-stone-100 p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <ShoppingBag className="h-4 w-4 text-amber-600" />
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm">
+                    <ShoppingBag className="h-4 w-4 text-white" />
+                  </div>
                   <h2 className="text-sm font-bold text-stone-800">توزيع الطلبات ({periodLabel})</h2>
                 </div>
                 {dashData.some(d => d.orders > 0) ? (
-                  <ResponsiveContainer width="100%" height={250}>
+                  <ResponsiveContainer width="100%" height={260}>
                     <PieChart>
-                      <Pie data={dashData.filter(d => d.orders > 0)} dataKey="orders" nameKey="label" cx="50%" cy="50%" outerRadius={80} label={({ label, percent }) => `${label} (${(percent * 100).toFixed(0)}%)`} labelLine={false}>
+                      <Pie data={dashData.filter(d => d.orders > 0)} dataKey="orders" nameKey="label" cx="50%" cy="50%" outerRadius={85} innerRadius={30} label={({ label, percent }) => `${label} ${(percent * 100).toFixed(0)}%`} labelLine={{ stroke: '#ddd', strokeWidth: 1 }}>
                         {dashData.filter(d => d.orders > 0).map((_, idx) => (
-                          <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
+                          <Cell key={idx} fill={COLORS[idx % COLORS.length]} stroke="white" strokeWidth={2} />
                         ))}
                       </Pie>
                       <Tooltip />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <p className="text-center text-sm text-stone-400 py-8">لا توجد بيانات</p>
+                  <div className="text-center py-10">
+                    <ShoppingBag className="h-10 w-10 text-stone-200 mx-auto mb-2" />
+                    <p className="text-sm text-stone-400">لا توجد بيانات</p>
+                  </div>
                 )}
               </div>
             </div>
 
             {/* Period detail table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden">
-              <div className="px-5 py-3 border-b border-stone-100">
-                <h2 className="text-sm font-bold text-stone-800">تفصيل {dashboardPeriod === 'day' ? 'الساعات' : 'الأيام'}</h2>
+            <div className="bg-white rounded-2xl shadow-md border border-stone-100 overflow-hidden">
+              <div className="px-5 py-3.5 bg-gradient-to-l from-stone-50 to-stone-100 border-b border-stone-100 flex items-center justify-between">
+                <h2 className="text-sm font-bold text-stone-700">تفصيل {dashboardPeriod === 'day' ? 'الساعات' : 'الأيام'}</h2>
+                <span className="text-[10px] text-stone-400">{dashData.filter(d => d.revenue > 0 || d.orders > 0).length} فترة</span>
               </div>
               <div className="divide-y divide-stone-50">
                 {dashData.filter(d => d.revenue > 0 || d.orders > 0 || d.returns > 0).length > 0 ? (
                   dashData.filter(d => d.revenue > 0 || d.orders > 0 || d.returns > 0).map(row => (
-                    <div key={row.date} className="flex items-center justify-between px-5 py-3 hover:bg-stone-50/50 transition-colors">
-                      <span className="text-sm font-medium text-stone-800">{row.label}</span>
-                      <div className="flex items-center gap-4 text-xs text-stone-500">
-                        <span>{row.orders} طلب</span>
-                        {row.returns > 0 && <span className="text-red-500">-{row.returns.toLocaleString('ar-EG')} ج.م</span>}
-                        <span className="font-bold text-amber-600">{row.revenue.toLocaleString('ar-EG')} ج.م</span>
+                    <div key={row.date} className="flex items-center justify-between px-5 py-3 hover:bg-amber-50/30 transition-colors">
+                      <span className="text-sm font-semibold text-stone-700">{row.label}</span>
+                      <div className="flex items-center gap-4 text-xs">
+                        <span className="text-stone-500">{row.orders} <span className="text-stone-300">طلب</span></span>
+                        {row.returns > 0 && <span className="text-red-500 font-medium">-{row.returns.toLocaleString('ar-EG')} <span className="text-red-300">ج.م</span></span>}
+                        <span className="font-bold text-amber-600">{row.revenue.toLocaleString('ar-EG')} <span className="text-amber-400 font-normal">ج.م</span></span>
                       </div>
                     </div>
                   ))

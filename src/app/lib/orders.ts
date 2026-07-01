@@ -115,6 +115,16 @@ export async function clearAllOrders(): Promise<void> {
   if (!res.ok) throw new Error('Failed to clear orders');
 }
 
+export async function clearOrdersByDate(dateStr: string): Promise<void> {
+  const all = await getOrders();
+  const dayStart = new Date(dateStr + 'T00:00:00').getTime();
+  const dayEnd = dayStart + 86400000;
+  const toDelete = all.filter(o => o.timestamp >= dayStart && o.timestamp < dayEnd);
+  await Promise.all(toDelete.map(o =>
+    fetch(`${DB_URL}/${o.id}.json`, { method: 'DELETE' })
+  ));
+}
+
 async function reportsApi(method: string, body?: unknown): Promise<any> {
   const res = await fetch(`${REPORTS_URL}.json`, {
     method,
