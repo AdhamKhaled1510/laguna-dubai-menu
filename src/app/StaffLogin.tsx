@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Coffee, CookingPot, BarChart3, QrCode, Lock, X } from 'lucide-react';
+import { Coffee, CookingPot, BarChart3, QrCode, Receipt, Lock, X, Users } from 'lucide-react';
 import logoUrl from '@/assets/logo.png';
 import { getPassword } from './lib/orders';
 
@@ -9,6 +9,7 @@ const DEFAULT_PASSWORDS: Record<string, string> = {
   barista: '1234',
   reports: '1234',
   invoices: '1234',
+  employees: '1234',
 };
 
 export default function StaffLogin() {
@@ -48,6 +49,16 @@ export default function StaffLogin() {
       gradient: 'from-emerald-600 to-emerald-700',
       shadow: 'shadow-emerald-900/30',
       hover: 'hover:from-emerald-500 hover:to-emerald-600',
+    },
+    {
+      id: 'employees',
+      label: 'الموظفين',
+      desc: 'الحضور والمرتبات',
+      path: '/employees',
+      icon: Users,
+      gradient: 'from-purple-600 to-purple-700',
+      shadow: 'shadow-purple-900/30',
+      hover: 'hover:from-purple-500 hover:to-purple-600',
     },
   ];
 
@@ -143,7 +154,7 @@ export default function StaffLogin() {
                 <Lock className="h-6 w-6 text-white" />
               </div>
               <h2 className="text-lg font-bold text-stone-800 mb-1">
-                {passwordModal.role === 'waiter' ? 'ويتر' : passwordModal.role === 'barista' ? 'باريستا' : 'التقارير'}
+                {passwordModal.role === 'waiter' ? 'ويتر' : passwordModal.role === 'barista' ? 'باريستا' : passwordModal.role === 'employees' ? 'الموظفين' : 'التقارير'}
               </h2>
               <p className="text-xs text-stone-400 mb-5">الرجاء إدخال كلمة السر</p>
               <input

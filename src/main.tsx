@@ -7,6 +7,7 @@ import BaristaPage from "./app/BaristaPage";
 import ReportsPage from "./app/ReportsPage";
 import InvoicesPage from "./app/InvoicesPage";
 import QRCodesPage from "./app/QRCodesPage";
+import EmployeesPage from "./app/EmployeesPage";
 import "./styles/index.css";
 
 function NotFound() {
@@ -32,6 +33,7 @@ createRoot(document.getElementById("root")!).render(
       <Route path="/reports" element={<ReportsPage />} />
       <Route path="/invoices" element={<InvoicesPage />} />
       <Route path="/qrcodes" element={<QRCodesPage />} />
+      <Route path="/employees" element={<EmployeesPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </HashRouter>

@@ -180,7 +180,7 @@ export async function deleteDailyReport(date: string): Promise<void> {
 }
 
 // ── Passwords ────────────────────────────────────────────
-export async function getPassword(role: 'waiter' | 'barista' | 'reports' | 'invoices'): Promise<string> {
+export async function getPassword(role: 'waiter' | 'barista' | 'reports' | 'invoices' | 'employees'): Promise<string> {
   try {
     const res = await fetch(`${PASS_URL}/${role}.json`);
     const data = await res.json();
@@ -270,6 +270,83 @@ export async function updateInvoiceStatus(
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+  });
+}
+
+// ── Employees & Attendance ──────────────────────────────
+const EMP_URL = 'https://laguna-dubai-default-rtdb.europe-west1.firebasedatabase.app/employees';
+const ATTEND_URL = 'https://laguna-dubai-default-rtdb.europe-west1.firebasedatabase.app/attendance';
+
+export interface Employee {
+  id: string;
+  name: string;
+  phone: string;
+  role: string;
+  salary: number;
+  active: boolean;
+  joinedAt: number;
+}
+
+export interface AttendanceRecord {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  date: string;
+  checkIn: number;
+  checkOut: number | null;
+}
+
+export async function getEmployees(): Promise<Employee[]> {
+  const res = await fetch(`${EMP_URL}.json`);
+  const data = await res.json();
+  if (!data) return [];
+  return Object.entries(data).map(([key, val]: [string, any]) => ({ ...val, id: key }));
+}
+
+export async function saveEmployee(employee: Omit<Employee, 'id'>): Promise<string> {
+  const res = await fetch(`${EMP_URL}.json`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(employee),
+  });
+  const data = await res.json();
+  return data.name;
+}
+
+export async function updateEmployee(id: string, data: Partial<Employee>): Promise<void> {
+  await fetch(`${EMP_URL}/${id}.json`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteEmployee(id: string): Promise<void> {
+  await fetch(`${EMP_URL}/${id}.json`, { method: 'DELETE' });
+}
+
+export async function getAttendance(): Promise<AttendanceRecord[]> {
+  const res = await fetch(`${ATTEND_URL}.json`);
+  const data = await res.json();
+  if (!data) return [];
+  return Object.entries(data).map(([key, val]: [string, any]) => ({ ...val, id: key }));
+}
+
+export async function saveAttendance(record: Omit<AttendanceRecord, 'id'>): Promise<string> {
+  const res = await fetch(`${ATTEND_URL}.json`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(record),
+  });
+  const data = await res.json();
+  return data.name;
+}
+
+export async function updateAttendance(id: string, data: Partial<AttendanceRecord>): Promise<void> {
+  await fetch(`${ATTEND_URL}/${id}.json`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
   });
 }
 
