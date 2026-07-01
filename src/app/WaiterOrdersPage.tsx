@@ -23,7 +23,7 @@ export default function WaiterOrdersPage() {
 
   const refresh = useCallback(async () => {
     const all = await getOrders();
-    const cutoff = Date.now() - 60 * 60 * 1000;
+    const cutoff = Date.now() - 30 * 60 * 1000;
     const completed = all
       .filter(o => o.status === 'completed' && o.timestamp > cutoff)
       .sort((a, b) => b.timestamp - a.timestamp);
