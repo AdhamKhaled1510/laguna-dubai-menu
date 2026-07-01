@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { HashRouter, Routes, Route } from 'react-router';
 import StaffLogin from "./app/StaffLogin";
 import WaiterPage from "./app/App";
+import WaiterOrdersPage from "./app/WaiterOrdersPage";
 import BaristaPage from "./app/BaristaPage";
 import ReportsPage from "./app/ReportsPage";
 import InvoicesPage from "./app/InvoicesPage";
@@ -13,6 +14,7 @@ createRoot(document.getElementById("root")!).render(
     <Routes>
       <Route path="/" element={<StaffLogin />} />
       <Route path="/waiter" element={<WaiterPage />} />
+      <Route path="/waiter-orders" element={<WaiterOrdersPage />} />
       <Route path="/barista" element={<BaristaPage />} />
       <Route path="/reports" element={<ReportsPage />} />
       <Route path="/invoices" element={<InvoicesPage />} />

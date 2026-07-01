@@ -22,8 +22,8 @@ export default function StaffLogin() {
     {
       id: 'waiter',
       label: 'ويتر',
-      desc: 'تسجيل الطلبات',
-      path: '/waiter',
+      desc: 'عرض الطلبات المكتملة',
+      path: '/waiter-orders',
       icon: Coffee,
       gradient: 'from-amber-500 to-amber-600',
       shadow: 'shadow-amber-900/30',
