@@ -7,9 +7,12 @@ import { Badge } from './ui/badge';
 import { MenuItemType } from './MenuItem';
 import logoUrl from '@/assets/logo.png';
 
+const MILK_PRICE = 5;
+
 interface CartItem {
   item: MenuItemType;
   quantity: number;
+  withMilk?: boolean;
 }
 
 interface CartSheetProps {
@@ -21,9 +24,11 @@ interface CartSheetProps {
   onCheckout: () => void;
 }
 
+const itemPrice = (ci: CartItem) => (ci.item.price + (ci.withMilk ? MILK_PRICE : 0));
+
 export function CartSheet({ cartItems, tableNumber, setTableNumber, onRemoveItem, onClearCart, onCheckout }: CartSheetProps) {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce((sum, item) => sum + itemPrice(item) * item.quantity, 0);
 
   return (
     <Sheet>
@@ -76,26 +81,29 @@ export function CartSheet({ cartItems, tableNumber, setTableNumber, onRemoveItem
           <>
             <ScrollArea className="flex-1 -mx-6 px-6 my-4">
               <div className="space-y-3">
-                {cartItems.map(({ item, quantity }) => (
-                  <div key={item.id} className="flex gap-3 md:gap-4 p-3 md:p-4 bg-stone-50 border border-stone-100 rounded-lg hover:border-stone-200 transition-colors">
+                {cartItems.map((ci) => (
+                  <div key={`${ci.item.id}-${ci.withMilk ? 'milk' : 'plain'}`} className="flex gap-3 md:gap-4 p-3 md:p-4 bg-stone-50 border border-stone-100 rounded-lg hover:border-stone-200 transition-colors">
                     <img
-                      src={item.image}
-                      alt={item.nameAr}
+                      src={ci.item.image}
+                      alt={ci.item.nameAr}
                       className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg"
                     />
                     <div className="flex-1 text-right">
-                      <h4 className="font-semibold text-sm md:text-base text-stone-800 mb-1">{item.nameAr}</h4>
+                      <h4 className="font-semibold text-sm md:text-base text-stone-800 mb-1">{ci.item.nameAr}</h4>
+                      {ci.withMilk && (
+                        <div className="text-xs text-amber-600 font-medium mb-1">+ حليب</div>
+                      )}
                       <div className="text-xs md:text-sm text-stone-400 mb-1">
-                        {item.price} ج.م × {quantity}
+                        {itemPrice(ci)} ج.م × {ci.quantity}
                       </div>
                       <div className="font-bold text-stone-800 text-sm md:text-base">
-                        {item.price * quantity} ج.م
+                        {itemPrice(ci) * ci.quantity} ج.م
                       </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => onRemoveItem(item.id)}
+                      onClick={() => onRemoveItem(ci.item.id)}
                       className="h-8 w-8 md:h-10 md:w-10 text-stone-300 hover:text-red-400 hover:bg-red-50"
                     >
                       <Trash2 className="h-4 w-4 md:h-5 md:w-5" />

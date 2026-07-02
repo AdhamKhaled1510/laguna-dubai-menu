@@ -101,7 +101,7 @@ const menuData: MenuItemType[] = [
   { id: 49, name: 'Watermelon Juice', nameAr: 'بطيخ', descriptionAr: 'عصير بطيخ', price: 60, image: IMG_JUICE, category: 'juices' },
   { id: 50, name: 'Date Juice', nameAr: 'بلح', descriptionAr: 'عصير بلح طازج', price: 75, image: IMG_JUICE, category: 'juices' },
   { id: 51, name: 'Avocado Juice', nameAr: 'افوكادو', descriptionAr: 'عصير أفوكادو', price: 80, image: IMG_JUICE, category: 'juices' },
-  { id: 52, name: 'Add Milk', nameAr: 'اضافه لبن', descriptionAr: 'إضافة حليب طازج', price: 5, image: IMG_JUICE, category: 'addons' },
+
   { id: 53, name: 'Delight Punch', nameAr: 'ديلايت بانش', descriptionAr: 'كوكتيل ديلايت بانش', price: 65, image: IMG_COCKTAIL, category: 'cocktails' },
   { id: 54, name: 'Timara', nameAr: 'تيمارا', descriptionAr: 'كوكتيل تيمارا', price: 65, image: IMG_COCKTAIL, category: 'cocktails' },
   { id: 55, name: 'Florida', nameAr: 'فلوريدا', descriptionAr: 'كوكتيل فلوريدا', price: 65, image: IMG_COCKTAIL, category: 'cocktails' },
@@ -186,9 +186,17 @@ const menuData: MenuItemType[] = [
   image: localImage(item.nameAr) || item.image,
 }));
 
+const MILK_PRICE = 5;
+const MILK_ELIGIBLE_IDS = new Set([
+  1, 2, 10, 6, 7, 18, 19, 20, 24, 25, 27, 29, 30, 31, 32, 33,
+  34, 5, 40, 41, 60, 61, 62, 63, 64, 65,
+  45, 48, 50, 47, 51, 46,
+]);
+
 interface CartItem {
   item: MenuItemType;
   quantity: number;
+  withMilk?: boolean;
 }
 
 function loadCart(): CartItem[] {
@@ -211,6 +219,7 @@ export default function App() {
   const [completedOrders, setCompletedOrders] = useState<Order[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
+  const [milkPromptItem, setMilkPromptItem] = useState<MenuItemType | null>(null);
   const [activeCategory, setActiveCategory] = useState('hot');
   const [headerVisible, setHeaderVisible] = useState(true);
   const [itemOrderCounts, setItemOrderCounts] = useState<Record<string, number>>({});
@@ -337,6 +346,10 @@ export default function App() {
   };
 
   const addToCart = (item: MenuItemType) => {
+    if (MILK_ELIGIBLE_IDS.has(item.id) && !cart.some(c => c.item.id === item.id)) {
+      setMilkPromptItem(item);
+      return;
+    }
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.item.id === item.id);
       const newCart = existingItem
@@ -345,7 +358,41 @@ export default function App() {
               ? { ...cartItem, quantity: cartItem.quantity + 1 }
               : cartItem
           )
-        : [...prevCart, { item, quantity: 1 }];
+        : [...prevCart, { item, quantity: 1, withMilk: false }];
+      saveCart(newCart);
+      return newCart;
+    });
+    toast.success(`تم إضافة ${item.nameAr} للطلب`);
+  };
+
+  const addWithMilk = (item: MenuItemType) => {
+    setMilkPromptItem(null);
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((cartItem) => cartItem.item.id === item.id);
+      const newCart = existingItem
+        ? prevCart.map((cartItem) =>
+            cartItem.item.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity + 1, withMilk: true }
+              : cartItem
+          )
+        : [...prevCart, { item, quantity: 1, withMilk: true }];
+      saveCart(newCart);
+      return newCart;
+    });
+    toast.success(`تم إضافة ${item.nameAr} + حليب للطلب`);
+  };
+
+  const addToCartNoMilk = (item: MenuItemType) => {
+    setMilkPromptItem(null);
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((cartItem) => cartItem.item.id === item.id);
+      const newCart = existingItem
+        ? prevCart.map((cartItem) =>
+            cartItem.item.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity + 1, withMilk: false }
+              : cartItem
+          )
+        : [...prevCart, { item, quantity: 1, withMilk: false }];
       saveCart(newCart);
       return newCart;
     });
@@ -393,8 +440,12 @@ export default function App() {
     if (checkingOut) return;
     setCheckingOut(true);
     try {
-      const totalPrice = cart.reduce((sum, item) => sum + item.item.price * item.quantity, 0);
-      const orderItems = cart.map(c => ({ nameAr: c.item.nameAr, quantity: c.quantity, price: c.item.price }));
+      const totalPrice = cart.reduce((sum, item) => sum + (item.item.price + (item.withMilk ? 5 : 0)) * item.quantity, 0);
+      const orderItems = cart.map(c => ({
+        nameAr: c.item.nameAr + (c.withMilk ? ' + حليب' : ''),
+        quantity: c.quantity,
+        price: c.item.price + (c.withMilk ? 5 : 0),
+      }));
       await saveOrder({
         tableNumber,
         items: orderItems,
@@ -450,7 +501,6 @@ export default function App() {
     { value: 'juices',   label: 'عصائر' },
     { value: 'cocktails',label: 'كوكتيل' },
     { value: 'mojito',   label: 'موهيتو' },
-    { value: 'addons',   label: 'اضافات' },
     { value: 'cans',     label: 'كانز' },
     { value: 'dessert',  label: 'حلويات' },
   ];
@@ -636,6 +686,37 @@ export default function App() {
         onClearCart={clearCart}
         onCheckout={handleCheckout}
       />
+
+      {/* Milk Prompt */}
+      {milkPromptItem && (
+        <>
+          <div className="fixed inset-0 bg-black/40 z-[200]" onClick={() => setMilkPromptItem(null)} />
+          <div className="fixed bottom-0 left-0 right-0 z-[200] bg-white rounded-t-2xl shadow-2xl p-6 animate-slide-up" style={{animation: 'slideUp 0.25s ease-out'}}>
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-amber-100 flex items-center justify-center">
+                <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <h3 className="text-lg font-bold text-stone-800 mb-1">إضافة حليب طازج؟</h3>
+              <p className="text-sm text-stone-500">لمشروب <span className="font-semibold text-stone-700">{milkPromptItem.nameAr}</span></p>
+              <p className="text-sm text-amber-600 font-bold mt-1">+5 ج.م</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => addWithMilk(milkPromptItem)}
+                className="flex-1 py-3 bg-amber-500 hover:bg-amber-400 text-stone-900 font-bold rounded-xl transition-colors active:scale-[0.98]"
+              >
+                <span className="text-base">نعم، مع حليب</span>
+              </button>
+              <button
+                onClick={() => addToCartNoMilk(milkPromptItem)}
+                className="flex-1 py-3 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold rounded-xl transition-colors active:scale-[0.98]"
+              >
+                <span className="text-base">لا شكراً</span>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Table Popup */}
       {tablePopupOpen && (
